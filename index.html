@@ -2,100 +2,183 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <title>Для нас</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Manrope:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #ffffff);
-      --text: var(--tg-theme-text-color, #000000);
-      --hint: var(--tg-theme-hint-color, #8a8a8e);
-      --card: var(--tg-theme-secondary-bg-color, #f2f2f7);
-      --btn: var(--tg-theme-button-color, #2481cc);
-      --btn-text: var(--tg-theme-button-text-color, #ffffff);
-      --red: #e53935;
-      --yellow: #f9a825;
-      --green: #43a047;
+      --bg1: #1a0f2e;
+      --bg2: #3b1747;
+      --bg3: #5a1f4a;
+      --text: #fdf4f7;
+      --hint: rgba(253, 244, 247, .62);
+      --glass: rgba(255, 255, 255, .08);
+      --glass-strong: rgba(255, 255, 255, .14);
+      --line: rgba(255, 255, 255, .14);
+      --accent1: #ff9eb5;
+      --accent2: #f7c98b;
+      --red: #ff5c6c;
+      --yellow: #ffc94d;
+      --green: #5fd68a;
+      --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+      --sans: "Manrope", -apple-system, "Segoe UI", Roboto, sans-serif;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg1); }
     body {
-      margin: 0; padding: 16px 16px 90px;
-      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg); color: var(--text);
+      margin: 0; padding: 22px 16px 110px; min-height: 100vh;
+      font-family: var(--sans); color: var(--text);
+      background:
+        radial-gradient(520px 420px at 105% -5%, rgba(255, 158, 181, .35), transparent 60%),
+        radial-gradient(480px 460px at -10% 45%, rgba(247, 201, 139, .20), transparent 60%),
+        radial-gradient(520px 520px at 110% 100%, rgba(140, 90, 255, .30), transparent 60%),
+        linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg3) 100%);
+      background-attachment: fixed;
     }
-    h1 { font-size: 24px; margin: 4px 0 4px; }
-    h2 { font-size: 20px; margin: 4px 0 12px; }
-    .sub { color: var(--hint); font-size: 14px; margin-bottom: 16px; }
-    .card {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--card); border-radius: 14px;
-      padding: 16px; margin-bottom: 10px; cursor: pointer;
-    }
-    .card:active { opacity: .7; }
-    .card .emoji { font-size: 26px; }
-    .card .body { flex: 1; min-width: 0; }
-    .card .name { font-weight: 600; font-size: 16px; }
-    .card .meta { color: var(--hint); font-size: 13px; margin-top: 2px; }
-    .card .arrow { color: var(--hint); font-size: 18px; }
-    .note { color: var(--hint); font-size: 14px; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
-    .empty { color: var(--hint); text-align: center; padding: 30px 10px; }
-    .fab {
-      position: fixed; left: 16px; right: 16px; bottom: 16px;
-      padding: 15px; font-size: 16px; font-weight: 600; border: 0;
-      border-radius: 14px; background: var(--btn); color: var(--btn-text);
-    }
-    .btn {
-      padding: 12px 16px; font-size: 15px; font-weight: 600; border: 0;
-      border-radius: 12px; background: var(--btn); color: var(--btn-text);
-    }
-    .btn.ghost { background: var(--card); color: var(--text); }
-    .btn.danger { background: var(--red); color: #fff; }
-    .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
-    .dot.red { background: var(--red); }
-    .dot.yellow { background: var(--yellow); }
-    .dot.green { background: var(--green); }
-    .legend { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--hint); margin-bottom: 14px; }
-    .legend div { display: flex; align-items: center; gap: 8px; }
-    .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 2px; }
-    .chip {
-      flex: none; padding: 8px 14px; border-radius: 20px; border: 0;
-      background: var(--card); color: var(--text); font-size: 14px;
-    }
-    .chip.active { background: var(--btn); color: var(--btn-text); }
-    .badge {
-      display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 10px;
-      background: var(--btn); color: var(--btn-text); margin-top: 4px;
-    }
-    .row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .row .btn { flex: 1; }
-    .section-title { font-size: 15px; font-weight: 600; margin: 18px 0 8px; }
+    #app { animation: fade .35s ease both; }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
+    /* Заголовки */
+    h1, h2 { font-family: var(--serif); font-weight: 700; margin: 0; }
+    .hero { text-align: center; padding: 14px 6px 22px; }
+    .hero .orn { color: var(--accent2); letter-spacing: 8px; font-size: 14px; opacity: .9; }
+    .hero h1 {
+      font-style: italic; font-size: 25px; line-height: 1.35; margin: 12px 0 0;
+      background: linear-gradient(90deg, #ffd9e2, #ffb3c6 45%, #f7c98b);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .page-title { font-size: 26px; font-style: italic; margin: 4px 0 6px; }
+    .sub { color: var(--hint); font-size: 14px; margin-bottom: 18px; line-height: 1.4; }
+
+    /* Карточки */
+    .card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--glass); border: 1px solid var(--line);
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+      border-radius: 20px; padding: 14px 16px; margin-bottom: 12px; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+      transition: transform .15s ease, background .15s ease;
+      animation: rise .45s ease both;
+    }
+    .card:active { transform: scale(.98); background: var(--glass-strong); }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .tile {
+      width: 52px; height: 52px; border-radius: 16px; flex: none;
+      display: grid; place-items: center; font-size: 26px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .35);
+    }
+    .card .body { flex: 1; min-width: 0; }
+    .card .name { font-weight: 700; font-size: 16px; line-height: 1.3; }
+    .card .meta { color: var(--hint); font-size: 13px; margin-top: 3px; }
+    .card .arrow { color: var(--hint); font-size: 22px; }
+    .note { color: var(--hint); font-size: 14px; margin-top: 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+    .empty { color: var(--hint); text-align: center; padding: 34px 10px; line-height: 1.5; }
+    .empty .big { font-size: 34px; display: block; margin-bottom: 6px; }
+
+    /* Кнопки */
+    .fab {
+      position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
+      padding: 16px; font: 700 16px var(--sans); border: 0; border-radius: 18px;
+      color: #3a1030; background: linear-gradient(135deg, var(--accent2), var(--accent1));
+      box-shadow: 0 10px 28px rgba(255, 158, 181, .38); z-index: 5;
+    }
+    .fab:active { transform: scale(.98); }
+    .btn {
+      padding: 13px 16px; font: 700 15px var(--sans); border: 0; border-radius: 14px;
+      color: #3a1030; background: linear-gradient(135deg, var(--accent2), var(--accent1));
+    }
+    .btn.ghost { background: var(--glass-strong); color: var(--text); border: 1px solid var(--line); }
+    .btn.danger { background: linear-gradient(135deg, #ff7a85, #e0364a); color: #fff; }
+    .row { display: flex; gap: 10px; margin-bottom: 8px; }
+    .row .btn { flex: 1; }
+    .section-title {
+      font-family: var(--serif); font-style: italic; font-size: 19px; margin: 24px 0 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+    .badge {
+      display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent1)); color: #3a1030; margin-top: 6px;
+    }
+
+    /* Цветовые метки */
+    .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+    .dot.red { background: var(--red); box-shadow: 0 0 12px var(--red); }
+    .dot.yellow { background: var(--yellow); box-shadow: 0 0 12px var(--yellow); }
+    .dot.green { background: var(--green); box-shadow: 0 0 12px var(--green); }
+    .legend {
+      display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--hint);
+      background: var(--glass); border: 1px solid var(--line); border-radius: 16px;
+      padding: 12px 14px; margin-bottom: 16px;
+    }
+    .legend div { display: flex; align-items: center; gap: 10px; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 2px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: none; padding: 9px 15px; border-radius: 20px; border: 1px solid var(--line);
+      background: var(--glass); color: var(--text); font: 600 14px var(--sans);
+    }
+    .chip.active { background: linear-gradient(135deg, var(--accent2), var(--accent1)); color: #3a1030; border-color: transparent; }
+
+    /* Фото */
+    .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .photo {
+      aspect-ratio: 1; border-radius: 14px; overflow: hidden; cursor: pointer;
+      background: var(--glass); border: 1px solid var(--line);
+    }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .viewer {
+      position: fixed; inset: 0; background: rgba(8, 3, 16, .96); z-index: 30;
+      display: flex; flex-direction: column; animation: fade .2s ease;
+    }
+    .viewer .stage { flex: 1; display: grid; place-items: center; padding: 12px; min-height: 0; }
+    .viewer img { max-width: 100%; max-height: 100%; border-radius: 12px; }
+    .viewer .bar { display: flex; gap: 8px; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+    .viewer .bar .btn { flex: 1; }
+    .counter { text-align: center; color: var(--hint); font-size: 13px; padding-top: 14px; }
+
+    /* Окно формы */
     .overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.45);
-      display: flex; align-items: flex-end; z-index: 10;
+      position: fixed; inset: 0; background: rgba(8, 3, 16, .6); z-index: 20;
+      display: flex; align-items: flex-end; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
     }
     .sheet {
       width: 100%; max-height: 92vh; overflow-y: auto;
-      background: var(--bg); border-radius: 18px 18px 0 0; padding: 18px 16px 24px;
+      background: linear-gradient(180deg, #2b1640, #20102f);
+      border: 1px solid var(--line); border-bottom: 0;
+      border-radius: 26px 26px 0 0; padding: 22px 18px calc(24px + env(safe-area-inset-bottom));
+      animation: slide .3s ease;
     }
-    .sheet h3 { margin: 0 0 14px; font-size: 18px; }
-    label { display: block; font-size: 13px; color: var(--hint); margin: 12px 0 4px; }
+    @keyframes slide { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sheet h3 { margin: 0 0 6px; font: italic 700 22px var(--serif); }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--hint); margin: 14px 0 6px; }
     input, textarea, select {
-      width: 100%; padding: 12px; font-size: 16px; border-radius: 10px;
-      border: 1px solid #8883; background: var(--card); color: var(--text);
-      font-family: inherit;
+      width: 100%; padding: 13px 14px; font: 500 16px var(--sans); border-radius: 14px;
+      border: 1px solid var(--line); background: rgba(255, 255, 255, .07); color: var(--text);
+      color-scheme: dark; outline: none;
     }
-    textarea { min-height: 90px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent1); }
+    input::placeholder, textarea::placeholder { color: rgba(253, 244, 247, .35); }
+    select option { background: #2b1640; color: #fff; }
+    textarea { min-height: 96px; resize: vertical; }
     .levels { display: flex; gap: 8px; }
     .level {
-      flex: 1; padding: 12px 6px; border-radius: 10px; border: 2px solid transparent;
-      background: var(--card); color: var(--text); font-size: 13px; text-align: center;
+      flex: 1; padding: 12px 6px; border-radius: 14px; border: 2px solid transparent;
+      background: rgba(255, 255, 255, .07); color: var(--text); font: 600 13px var(--sans); text-align: center;
     }
-    .level.sel.red { border-color: var(--red); }
-    .level.sel.yellow { border-color: var(--yellow); }
-    .level.sel.green { border-color: var(--green); }
-    .actions { display: flex; gap: 8px; margin-top: 18px; }
+    .level.sel.red { border-color: var(--red); background: rgba(255, 92, 108, .14); }
+    .level.sel.yellow { border-color: var(--yellow); background: rgba(255, 201, 77, .14); }
+    .level.sel.green { border-color: var(--green); background: rgba(95, 214, 138, .14); }
+    .actions { display: flex; gap: 10px; margin-top: 22px; }
     .actions .btn { flex: 1; }
+    .toast {
+      position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 40;
+      background: rgba(255, 255, 255, .95); color: #3a1030; padding: 10px 18px;
+      border-radius: 20px; font: 700 14px var(--sans); box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+    }
   </style>
 </head>
 <body>
@@ -105,29 +188,31 @@
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
+    try { tg.setHeaderColor("#1a0f2e"); tg.setBackgroundColor("#1a0f2e"); } catch (e) {}
+
+    // ---------- Настройки разделов (иконки и цвета можно менять здесь) ----------
+    const SECTIONS = {
+      dates:  { emoji: "🗓️", title: "Важные даты",                    grad: "linear-gradient(135deg,#ffb88c,#ff7a8a)" },
+      trips:  { emoji: "🧳", title: "Наши поездки с воспоминаниями",  grad: "linear-gradient(135deg,#7ad7f0,#6f86ff)" },
+      our:    { emoji: "🫶", title: "Наши предпочтения",              grad: "linear-gradient(135deg,#ff9eb5,#c77dff)" },
+      isa:    { emoji: "🌙", title: "Предпочтения Исы",               grad: "linear-gradient(135deg,#7c8cff,#4b4fd6)" },
+      makosh: { emoji: "🌷", title: "Предпочтения Макош",             grad: "linear-gradient(135deg,#ffc2d9,#ff6fa5)" }
+    };
+
+    const LEVELS = {
+      red:    { name: "Красный", hint: "важно" },
+      yellow: { name: "Жёлтый",  hint: "не сильно, но желательно" },
+      green:  { name: "Зелёный", hint: "предпочтительно, но можно и без этого" }
+    };
+    const LEVEL_ORDER = { red: 0, yellow: 1, green: 2 };
 
     // ---------- Данные ----------
     const KEY = "isa_makosh_v1";
 
-    const SECTIONS = {
-      dates:  { emoji: "📅", title: "Важные даты" },
-      trips:  { emoji: "✈️", title: "Наши поездки с воспоминаниями" },
-      our:    { emoji: "💞", title: "Наши предпочтения" },
-      isa:    { emoji: "🧔", title: "Предпочтения Исы" },
-      makosh: { emoji: "🌸", title: "Предпочтения Макош" }
-    };
-
-    const LEVELS = {
-      red:    { name: "Красный",  hint: "важно" },
-      yellow: { name: "Жёлтый",   hint: "не сильно, но желательно" },
-      green:  { name: "Зелёный",  hint: "предпочтительно, но можно и без этого" }
-    };
-    const LEVEL_ORDER = { red: 0, yellow: 1, green: 2 };
-
     function defaultState() {
       const trips = [];
       for (let i = 1; i <= 10; i++) {
-        trips.push({ id: "t" + i, title: "Поездка " + i, place: "", when: "", notes: "", memories: [] });
+        trips.push({ id: "t" + i, title: "Поездка " + i, place: "", when: "", notes: "", memories: [], photoCount: 0 });
       }
       return { dates: [], trips: trips, prefs: { our: [], isa: [], makosh: [] } };
     }
@@ -138,23 +223,70 @@
         if (raw) {
           const s = JSON.parse(raw);
           const d = defaultState();
-          return {
+          const st = {
             dates: s.dates || d.dates,
             trips: s.trips || d.trips,
             prefs: Object.assign(d.prefs, s.prefs || {})
           };
+          st.trips.forEach(t => { if (typeof t.photoCount !== "number") t.photoCount = 0; if (!t.memories) t.memories = []; });
+          return st;
         }
       } catch (e) {}
       return defaultState();
     }
 
     let state = load();
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-    function save() {
-      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    // ---------- Хранилище фотографий (IndexedDB) ----------
+    let dbPromise;
+    function db() {
+      if (!dbPromise) {
+        dbPromise = new Promise((resolve, reject) => {
+          const r = indexedDB.open("isa_makosh_photos", 1);
+          r.onupgradeneeded = () => {
+            const s = r.result.createObjectStore("photos", { keyPath: "id" });
+            s.createIndex("tripId", "tripId");
+          };
+          r.onsuccess = () => resolve(r.result);
+          r.onerror = () => reject(r.error);
+        });
+      }
+      return dbPromise;
+    }
+    function tx(mode, fn) {
+      return db().then(d => new Promise((resolve, reject) => {
+        const t = d.transaction("photos", mode);
+        const req = fn(t.objectStore("photos"));
+        t.oncomplete = () => resolve(req ? req.result : undefined);
+        t.onerror = () => reject(t.error);
+      }));
+    }
+    const putPhoto = rec => tx("readwrite", s => s.put(rec));
+    const getPhotos = tripId => tx("readonly", s => s.index("tripId").getAll(tripId));
+    const delPhoto = id => tx("readwrite", s => s.delete(id));
+
+    async function deleteTripPhotos(tripId) {
+      try { const list = await getPhotos(tripId); for (const p of list) await delPhoto(p.id); } catch (e) {}
     }
 
-    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    function resizeImage(file, max) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * k);
+          c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("blob")); }, "image/jpeg", 0.82);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img")); };
+        img.src = url;
+      });
+    }
 
     // ---------- Помощники ----------
     function h(tag, attrs, ...children) {
@@ -171,8 +303,13 @@
       return e;
     }
 
-    function haptic(type) {
-      try { tg.HapticFeedback.impactOccurred(type || "light"); } catch (e) {}
+    function haptic(type) { try { tg.HapticFeedback.impactOccurred(type || "light"); } catch (e) {} }
+
+    function toast(text, ms) {
+      const t = h("div", { class: "toast" }, text);
+      document.body.append(t);
+      if (ms) setTimeout(() => t.remove(), ms);
+      return t;
     }
 
     function formatDate(iso) {
@@ -201,8 +338,7 @@
       return "Прошло " + Math.abs(n) + " дн. назад";
     }
 
-    // ---------- Модальное окно с формой ----------
-    // fields: [{key, label, type: text|date|textarea|select|level, options}]
+    // ---------- Окно с формой ----------
     function openForm(opts) {
       const values = Object.assign({}, opts.values || {});
       const inputs = {};
@@ -215,9 +351,10 @@
           if (!values[f.key]) values[f.key] = "red";
           const wrap = h("div", { class: "levels" });
           Object.keys(LEVELS).forEach(k => {
-            const b = h("button", { type: "button", class: "level " + k }, 
-              h("div", { class: "dot " + k, style: "margin:0 auto 6px" }),
-              LEVELS[k].name, h("div", { style: "font-size:11px;color:var(--hint);margin-top:2px" }, LEVELS[k].hint));
+            const b = h("button", { type: "button", class: "level " + k },
+              h("div", { class: "dot " + k, style: "margin:0 auto 8px" }),
+              LEVELS[k].name,
+              h("div", { style: "font-size:11px;color:var(--hint);margin-top:3px;font-weight:500" }, LEVELS[k].hint));
             b.onclick = () => {
               values[f.key] = k;
               wrap.querySelectorAll(".level").forEach(x => x.classList.remove("sel"));
@@ -255,11 +392,8 @@
       actions.append(h("button", { class: "btn", onclick: () => {
         const out = Object.assign({}, values);
         for (const k in inputs) out[k] = inputs[k].value.trim();
-        const firstRequired = opts.fields.find(f => f.required);
-        if (firstRequired && !out[firstRequired.key]) {
-          inputs[firstRequired.key].focus();
-          return;
-        }
+        const req = opts.fields.find(f => f.required);
+        if (req && !out[req.key]) { inputs[req.key].focus(); return; }
         opts.onSave(out);
         haptic("medium");
         close();
@@ -269,7 +403,7 @@
 
       if (opts.onDelete) {
         let armed = false;
-        const del = h("button", { class: "btn danger", style: "width:100%;margin-top:10px" }, "Удалить");
+        const del = h("button", { class: "btn danger", style: "width:100%;margin-top:12px" }, "Удалить");
         del.onclick = () => {
           if (!armed) { armed = true; del.textContent = "Нажми ещё раз, чтобы удалить"; return; }
           opts.onDelete();
@@ -285,23 +419,18 @@
 
     // ---------- Навигация ----------
     let stack = [{ name: "home" }];
+    let photoUrls = [];
 
-    function go(name, param) {
-      stack.push({ name, param });
-      render();
-      window.scrollTo(0, 0);
-    }
-
-    function back() {
-      if (stack.length > 1) { stack.pop(); render(); window.scrollTo(0, 0); }
-    }
-
+    function go(name, param) { stack.push({ name, param }); render(); window.scrollTo(0, 0); }
+    function back() { if (stack.length > 1) { stack.pop(); render(); window.scrollTo(0, 0); } }
     tg.BackButton.onClick(back);
 
     function render() {
       const app = document.getElementById("app");
       app.innerHTML = "";
+      app.style.animation = "none"; void app.offsetWidth; app.style.animation = "";
       document.querySelectorAll(".fab").forEach(e => e.remove());
+      photoUrls.forEach(u => URL.revokeObjectURL(u)); photoUrls = [];
       const cur = stack[stack.length - 1];
 
       if (stack.length > 1) tg.BackButton.show(); else tg.BackButton.hide();
@@ -313,36 +442,39 @@
       else if (cur.name === "prefs") renderPrefs(app, cur.param);
     }
 
-    function addFab(text, onclick) {
-      document.body.append(h("button", { class: "fab", onclick }, text));
-    }
+    function addFab(text, onclick) { document.body.append(h("button", { class: "fab", onclick }, text)); }
+
+    function delay(i) { return "animation-delay:" + (i * 0.06) + "s"; }
 
     // ---------- Главный экран ----------
     function renderHome(app) {
-      app.append(h("h1", { style: "font-size:20px;line-height:1.35;margin:4px 0 18px" }, "Это приложение создано для нашего удобства и заботы друг о друге ❤️"));
+      app.append(h("div", { class: "hero" },
+        h("div", { class: "orn" }, "✦ ✦ ✦"),
+        h("h1", {}, "Это приложение создано для нашего удобства и заботы друг о друге ❤️")));
 
       const counts = {
         dates: state.dates.length,
-        trips: state.trips.filter(t => t.place || t.when || t.notes || t.memories.length).length,
+        trips: state.trips.filter(t => t.place || t.when || t.notes || t.memories.length || t.photoCount).length,
         our: state.prefs.our.length,
         isa: state.prefs.isa.length,
         makosh: state.prefs.makosh.length
       };
 
-      Object.keys(SECTIONS).forEach(key => {
+      Object.keys(SECTIONS).forEach((key, i) => {
         const s = SECTIONS[key];
-        const card = h("div", { class: "card", onclick: () => {
+        app.append(h("div", { class: "card", style: delay(i), onclick: () => {
           haptic();
           if (key === "dates") go("dates");
           else if (key === "trips") go("trips");
           else go("prefs", key);
         } },
-          h("div", { class: "emoji" }, s.emoji),
+          h("div", { class: "tile", style: "background:" + s.grad }, s.emoji),
           h("div", { class: "body" },
             h("div", { class: "name" }, s.title),
-            h("div", { class: "meta" }, key === "trips" ? "Заполнено: " + counts[key] + " из " + state.trips.length : "Записей: " + counts[key])),
-          h("div", { class: "arrow" }, "›"));
-        app.append(card);
+            h("div", { class: "meta" }, key === "trips"
+              ? "Заполнено: " + counts[key] + " из " + state.trips.length
+              : "Записей: " + counts[key])),
+          h("div", { class: "arrow" }, "›")));
       });
     }
 
@@ -355,23 +487,24 @@
     ];
 
     function renderDates(app) {
-      app.append(h("h2", {}, "📅 Важные даты"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.dates.emoji + " Важные даты"));
+      app.append(h("div", { class: "sub" }, "Ближайшие даты показаны первыми"));
 
       if (!state.dates.length) {
-        app.append(h("div", { class: "empty" }, "Пока пусто.\nДобавь первую дату кнопкой ниже."));
+        app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "💌"), "Пока пусто.", h("br"), "Добавь первую дату кнопкой ниже."));
       }
 
       const sorted = state.dates.slice().sort((a, b) => {
-        const da = daysUntil(a), db = daysUntil(b);
-        if (da === null) return 1; if (db === null) return -1;
-        const pa = da < 0, pb = db < 0;
+        const da = daysUntil(a), db2 = daysUntil(b);
+        if (da === null) return 1; if (db2 === null) return -1;
+        const pa = da < 0, pb = db2 < 0;
         if (pa !== pb) return pa ? 1 : -1;
-        return pa ? db - da : da - db;
+        return pa ? db2 - da : da - db2;
       });
 
-      sorted.forEach(item => {
+      sorted.forEach((item, i) => {
         const n = daysUntil(item);
-        app.append(h("div", { class: "card", onclick: () => editDate(item) },
+        app.append(h("div", { class: "card", style: delay(i), onclick: () => editDate(item) },
           h("div", { class: "body" },
             h("div", { class: "name" }, item.title),
             h("div", { class: "meta" }, formatDate(item.date) + (item.repeat === "yearly" ? " · каждый год" : "")),
@@ -405,25 +538,27 @@
     ];
 
     function renderTrips(app) {
-      app.append(h("h2", {}, "✈️ Наши поездки"));
-      app.append(h("div", { class: "sub" }, "Открой поездку, чтобы заполнить её и добавить воспоминания"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.trips.emoji + " Наши поездки"));
+      app.append(h("div", { class: "sub" }, "Открой поездку, чтобы заполнить её, добавить воспоминания и фото"));
 
       state.trips.forEach((t, i) => {
-        const filled = t.place || t.when || t.notes || t.memories.length;
-        app.append(h("div", { class: "card", onclick: () => { haptic(); go("trip", t.id); } },
-          h("div", { class: "emoji" }, filled ? "📸" : "🗺️"),
+        const filled = t.place || t.when || t.notes || t.memories.length || t.photoCount;
+        const extra = [];
+        if (t.memories.length) extra.push("воспоминаний: " + t.memories.length);
+        if (t.photoCount) extra.push("фото: " + t.photoCount);
+        app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => { haptic(); go("trip", t.id); } },
+          h("div", { class: "tile", style: "background:" + (filled ? SECTIONS.trips.grad : "var(--glass-strong)") }, filled ? "📸" : "🗺️"),
           h("div", { class: "body" },
             h("div", { class: "name" }, t.title),
             h("div", { class: "meta" },
-              [t.place, t.when].filter(Boolean).join(" · ") || "Ещё не заполнено",
-              t.memories.length ? " · воспоминаний: " + t.memories.length : "")),
+              [[t.place, t.when].filter(Boolean).join(" · ") || "Ещё не заполнено"].concat(extra).join(" · "))),
           h("div", { class: "arrow" }, "›")));
       });
 
       addFab("+ Добавить поездку", () => {
         openForm({
           title: "Новая поездка", fields: TRIP_FIELDS,
-          onSave: v => { state.trips.push({ id: uid(), title: v.title, place: v.place, when: v.when, notes: v.notes, memories: [] }); save(); }
+          onSave: v => { state.trips.push({ id: uid(), title: v.title, place: v.place, when: v.when, notes: v.notes, memories: [], photoCount: 0 }); save(); }
         });
       });
     }
@@ -436,31 +571,86 @@
       const trip = state.trips.find(t => t.id === id);
       if (!trip) { back(); return; }
 
-      app.append(h("h2", {}, trip.title));
-      if (trip.place || trip.when) app.append(h("div", { class: "sub" }, [trip.place, trip.when].filter(Boolean).join(" · ")));
-      if (trip.notes) app.append(h("div", { class: "note", style: "margin-bottom:12px" }, trip.notes));
+      app.append(h("h2", { class: "page-title" }, trip.title));
+      if (trip.place || trip.when) app.append(h("div", { class: "sub", style: "margin-bottom:8px" }, "📍 " + [trip.place, trip.when].filter(Boolean).join(" · ")));
+      if (trip.notes) app.append(h("div", { class: "note", style: "margin:0 0 14px" }, trip.notes));
 
       app.append(h("div", { class: "row" },
         h("button", { class: "btn ghost", onclick: () => {
           openForm({
             title: "Данные поездки", fields: TRIP_FIELDS, values: trip,
             onSave: v => { Object.assign(trip, { title: v.title, place: v.place, when: v.when, notes: v.notes }); save(); },
-            onDelete: () => { state.trips = state.trips.filter(t => t.id !== trip.id); save(); },
+            onDelete: () => { state.trips = state.trips.filter(t => t.id !== trip.id); save(); deleteTripPhotos(trip.id); },
             afterDelete: () => { stack.pop(); }
           });
         } }, "✎ Изменить данные")));
 
-      app.append(h("div", { class: "section-title" }, "Воспоминания"));
-      if (!trip.memories.length) app.append(h("div", { class: "empty" }, "Воспоминаний пока нет"));
+      // Фото
+      app.append(h("div", { class: "section-title" }, "Фотографии"));
 
-      trip.memories.forEach(m => {
-        app.append(h("div", { class: "card", onclick: () => {
+      const fileInput = h("input", { type: "file", accept: "image/*", multiple: "multiple", style: "display:none" });
+      const gallery = h("div", { class: "gallery" });
+
+      fileInput.onchange = async () => {
+        const files = Array.from(fileInput.files || []);
+        fileInput.value = "";
+        if (!files.length) return;
+        const t = toast("Загружаю фото…");
+        let added = 0;
+        for (const f of files) {
+          try {
+            const blob = await resizeImage(f, 1280);
+            await putPhoto({ id: uid(), tripId: trip.id, blob: blob, ts: Date.now() });
+            trip.photoCount++; added++;
+          } catch (e) {}
+        }
+        t.remove();
+        save();
+        if (added < files.length) toast("Не все фото удалось добавить", 2500);
+        else toast("Добавлено: " + added, 1500);
+        haptic("medium");
+        fillGallery();
+      };
+
+      app.append(h("div", { class: "row" },
+        h("button", { class: "btn", onclick: () => fileInput.click() }, "📷 Добавить фото"), fileInput));
+      app.append(gallery);
+
+      async function fillGallery() {
+        let list = [];
+        try { list = await getPhotos(trip.id); } catch (e) {}
+        list.sort((a, b) => a.ts - b.ts);
+        if (trip.photoCount !== list.length) { trip.photoCount = list.length; save(); }
+        photoUrls.forEach(u => URL.revokeObjectURL(u)); photoUrls = [];
+        gallery.innerHTML = "";
+        if (!list.length) {
+          gallery.style.display = "block";
+          gallery.append(h("div", { class: "empty", style: "padding:18px" }, "Фотографий пока нет"));
+          return;
+        }
+        gallery.style.display = "";
+        list.forEach((p, idx) => {
+          const url = URL.createObjectURL(p.blob);
+          photoUrls.push(url);
+          gallery.append(h("div", { class: "photo", onclick: () => openViewer(list, idx, trip, fillGallery) },
+            h("img", { src: url, alt: "" })));
+        });
+      }
+      fillGallery();
+
+      // Воспоминания
+      app.append(h("div", { class: "section-title" }, "Воспоминания"));
+      if (!trip.memories.length) app.append(h("div", { class: "empty", style: "padding:18px" }, "Воспоминаний пока нет"));
+
+      trip.memories.forEach((m, i) => {
+        app.append(h("div", { class: "card", style: delay(i), onclick: () => {
           openForm({
             title: "Воспоминание", fields: MEMORY_FIELDS, values: m,
             onSave: v => { m.text = v.text; save(); },
             onDelete: () => { trip.memories = trip.memories.filter(x => x.id !== m.id); save(); }
           });
-        } }, h("div", { class: "body" }, h("div", { class: "note", style: "margin:0;color:var(--text)" }, m.text))));
+        } }, h("div", { class: "tile", style: "width:40px;height:40px;font-size:20px;background:" + SECTIONS.trips.grad }, "💭"),
+          h("div", { class: "body" }, h("div", { style: "white-space:pre-wrap;word-break:break-word;line-height:1.5;font-size:15px" }, m.text))));
       });
 
       addFab("+ Добавить воспоминание", () => {
@@ -469,6 +659,56 @@
           onSave: v => { trip.memories.push({ id: uid(), text: v.text }); save(); }
         });
       });
+    }
+
+    // ---------- Просмотр фото ----------
+    function openViewer(list, startIdx, trip, onChange) {
+      let idx = startIdx;
+      let currentUrl = null;
+      const img = h("img", { alt: "" });
+      const counter = h("div", { class: "counter" });
+      const stage = h("div", { class: "stage" }, img);
+      const prev = h("button", { class: "btn ghost" }, "‹");
+      const next = h("button", { class: "btn ghost" }, "›");
+      const del = h("button", { class: "btn danger", style: "flex:2" }, "Удалить");
+      const closeBtn = h("button", { class: "btn ghost", style: "flex:2" }, "Закрыть");
+      const viewer = h("div", { class: "viewer" }, counter, stage, h("div", { class: "bar" }, prev, closeBtn, del, next));
+
+      function show() {
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        currentUrl = URL.createObjectURL(list[idx].blob);
+        img.src = currentUrl;
+        counter.textContent = (idx + 1) + " / " + list.length;
+        del.textContent = "Удалить";
+        armed = false;
+      }
+      let armed = false;
+      const closeViewer = () => { if (currentUrl) URL.revokeObjectURL(currentUrl); viewer.remove(); };
+
+      prev.onclick = () => { idx = (idx - 1 + list.length) % list.length; show(); };
+      next.onclick = () => { idx = (idx + 1) % list.length; show(); };
+      closeBtn.onclick = closeViewer;
+      del.onclick = async () => {
+        if (!armed) { armed = true; del.textContent = "Точно?"; return; }
+        try { await delPhoto(list[idx].id); } catch (e) {}
+        trip.photoCount = Math.max(0, trip.photoCount - 1); save();
+        list.splice(idx, 1);
+        onChange();
+        if (!list.length) { closeViewer(); return; }
+        if (idx >= list.length) idx = list.length - 1;
+        show();
+      };
+
+      let x0 = null;
+      stage.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+      stage.addEventListener("touchend", e => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0; x0 = null;
+        if (dx > 50) prev.onclick(); else if (dx < -50) next.onclick();
+      });
+
+      document.body.append(viewer);
+      show();
     }
 
     // ---------- Предпочтения ----------
@@ -481,7 +721,7 @@
 
     function renderPrefs(app, key) {
       const s = SECTIONS[key];
-      app.append(h("h2", {}, s.emoji + " " + s.title));
+      app.append(h("h2", { class: "page-title" }, s.emoji + " " + s.title));
 
       const legend = h("div", { class: "legend" });
       Object.keys(LEVELS).forEach(k => {
@@ -502,10 +742,10 @@
       if (prefFilter[key] !== "all") list = list.filter(p => p.level === prefFilter[key]);
       list.sort((a, b) => LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]);
 
-      if (!list.length) app.append(h("div", { class: "empty" }, "Здесь пока ничего нет"));
+      if (!list.length) app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "✨"), "Здесь пока ничего нет"));
 
-      list.forEach(p => {
-        app.append(h("div", { class: "card", onclick: () => {
+      list.forEach((p, i) => {
+        app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => {
           openForm({
             title: "Изменить предпочтение", fields: PREF_FIELDS, values: p,
             onSave: v => { p.text = v.text; p.level = v.level; save(); },
@@ -513,7 +753,7 @@
           });
         } },
           h("div", { class: "dot " + p.level }),
-          h("div", { class: "body" }, h("div", { class: "name", style: "font-weight:500;white-space:pre-wrap;word-break:break-word" }, p.text))));
+          h("div", { class: "body" }, h("div", { style: "font-weight:500;line-height:1.45;white-space:pre-wrap;word-break:break-word" }, p.text))));
       });
 
       addFab("+ Добавить предпочтение", () => {
