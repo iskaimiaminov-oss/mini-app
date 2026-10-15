@@ -283,6 +283,13 @@
     // =====================================================================
     const START = "2025-08-13"; // дата начала отношений (ГГГГ-ММ-ДД)
 
+    // Адрес твоего сервера (Cloudflare Worker), например "https://diary-api.твойник.workers.dev"
+    // Пока пусто: приложение работает только на этом устройстве, без синхронизации.
+    const API_URL = "";
+    const API_BASE = API_URL.replace(/\/+$/, "");
+    const SYNC_ON = !!API_BASE && !!tg.initData;
+    const REMOTE = SYNC_ON;
+
     const WELCOME_TITLE = "Привет, Макош!";
     const WELCOME_TEXT = "Добро пожаловать в наш виртуальный дневник";
 
@@ -387,20 +394,315 @@
     }
 
     let state = load();
-    function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+    let pushTimer = null;
+    function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+    function save() {
+      persist();
+      if (SYNC_ON && localStorage.getItem(INIT_KEY)) { clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 400); }
+    }
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
-    function applySeeds() {
+    // known: id записей, которые уже есть на сервере (чтобы не создавать дубли)
+    function applySeeds(known) {
       let changed = false;
-      SEED_DATES.forEach(s => {
-        if (!state.seeded.includes(s.id)) { state.dates.push(Object.assign({}, s)); state.seeded.push(s.id); changed = true; }
-      });
-      SEED_LETTERS.forEach(s => {
-        if (!state.seeded.includes(s.id)) { state.letters.push(Object.assign({}, s)); state.seeded.push(s.id); changed = true; }
-      });
+      const tryAdd = (s, list) => {
+        if (state.seeded.includes(s.id)) return;
+        state.seeded.push(s.id); changed = true;
+        if ((known && known.has(s.id)) || list.some(x => x.id === s.id)) return;
+        list.push(Object.assign({}, s));
+      };
+      SEED_DATES.forEach(s => tryAdd(s, state.dates));
+      SEED_LETTERS.forEach(s => tryAdd(s, state.letters));
       if (changed) save();
     }
-    applySeeds();
+
+    // =====================================================================
+    //   СИНХРОНИЗАЦИЯ С СЕРВЕРОМ
+    // =====================================================================
+    const SNAP_KEY = "sync_snap_v1", SINCE_KEY = "sync_since_v1", INIT_KEY = "sync_init_v1";
+    let lastKnownIds = null;
+    let lastSyncError = "";
+
+    // Одинаковая строка для одинаковых данных (порядок ключей не важен)
+    function stable(v) {
+      if (Array.isArray(v)) return "[" + v.map(stable).join(",") + "]";
+      if (v && typeof v === "object") {
+        return "{" + Object.keys(v).filter(k => v[k] !== undefined).sort().map(k => JSON.stringify(k) + ":" + stable(v[k])).join(",") + "}";
+      }
+      return JSON.stringify(v);
+    }
+
+    function getSnap() { try { return JSON.parse(localStorage.getItem(SNAP_KEY) || "{}"); } catch (e) { return {}; } }
+    function setSnap(s) { try { localStorage.setItem(SNAP_KEY, JSON.stringify(s)); } catch (e) {} }
+
+    async function apiFetch(path, opts) {
+      opts = opts || {};
+      const headers = Object.assign({ "X-Init-Data": tg.initData }, opts.headers || {});
+      const res = await fetch(API_BASE + path, Object.assign({}, opts, { headers: headers }));
+      if (!res.ok) throw new Error(String(res.status));
+      return res;
+    }
+
+    // Превращаем все данные в плоский список записей: ключ "раздел:id"
+    function flatten() {
+      const f = {};
+      const put = (col, o) => {
+        const d = Object.assign({}, o);
+        delete d.photoCount;
+        if (col === "trips") delete d.memories;
+        f[col + ":" + o.id] = { col: col, id: o.id, data: d };
+      };
+      state.dates.forEach(o => put("dates", o));
+      state.trips.forEach(t => {
+        put("trips", t);
+        (t.memories || []).forEach(m => {
+          f["memories:" + m.id] = { col: "memories", id: m.id, data: { id: m.id, tripId: t.id, text: m.text } };
+        });
+      });
+      ["our", "isa", "makosh"].forEach(k => (state.prefs[k] || []).forEach(o => put("prefs_" + k, o)));
+      state.reasons.forEach(o => put("reasons", o));
+      state.coupons.forEach(o => put("coupons", o));
+      state.songs.forEach(o => put("songs", o));
+      state.letters.forEach(o => put("letters", o));
+      state.wishes.forEach(o => put("wishes", o));
+      Object.keys(state.couponUsed).forEach(cid => {
+        f["couponUsed:cu_" + cid] = { col: "couponUsed", id: "cu_" + cid, data: { cid: cid, on: state.couponUsed[cid] } };
+      });
+      return f;
+    }
+
+    function listFor(col) {
+      if (col.indexOf("prefs_") === 0) return state.prefs[col.slice(6)] || null;
+      return { dates: state.dates, trips: state.trips, reasons: state.reasons, coupons: state.coupons,
+               songs: state.songs, letters: state.letters, wishes: state.wishes }[col] || null;
+    }
+
+    // Применяем запись, пришедшую с сервера
+    function applyRemote(it) {
+      const d = it.data || {};
+      if (it.col === "couponUsed") {
+        if (it.deleted) delete state.couponUsed[d.cid]; else state.couponUsed[d.cid] = d.on;
+        return;
+      }
+      if (it.col === "memories") {
+        const trip = state.trips.find(t => t.id === d.tripId);
+        if (!trip) return;
+        const i = trip.memories.findIndex(m => m.id === it.id);
+        if (it.deleted) { if (i >= 0) trip.memories.splice(i, 1); }
+        else if (i >= 0) trip.memories[i] = { id: it.id, text: d.text };
+        else trip.memories.push({ id: it.id, text: d.text });
+        return;
+      }
+      const list = listFor(it.col);
+      if (!list) return;
+      const i = list.findIndex(x => x.id === it.id);
+      if (it.deleted) { if (i >= 0) list.splice(i, 1); return; }
+      const obj = Object.assign({}, d);
+      if (it.col === "trips") obj.memories = i >= 0 ? list[i].memories : [];
+      if (it.col === "trips" || it.col === "wishes") obj.photoCount = (i >= 0 && list[i].photoCount) || 0;
+      if (i >= 0) list[i] = obj; else list.push(obj);
+    }
+
+    function labelFor(rec) {
+      const d = rec.data || {};
+      switch (rec.col) {
+        case "dates": case "trips": case "coupons": case "songs": return d.title || "";
+        case "wishes": return d.text || "";
+        case "memories": { const t = state.trips.find(x => x.id === d.tripId); return t ? t.title : ""; }
+        case "couponUsed": { const c = COUPONS.concat(state.coupons).find(x => x.id === d.cid); return c ? c.title : ""; }
+        default: return String(d.text || d.title || "").slice(0, 80);
+      }
+    }
+
+    async function pull(initial) {
+      const since = initial ? 0 : Number(localStorage.getItem(SINCE_KEY) || 0);
+      const res = await (await apiFetch("/api/sync?since=" + since)).json();
+      const snap = getSnap();
+      const flat = flatten();
+      const known = new Set();
+      let changed = false;
+      // сначала всё, кроме воспоминаний, чтобы поездки уже существовали
+      const items = res.items.filter(i => i.col !== "memories").concat(res.items.filter(i => i.col === "memories"));
+      items.forEach(it => {
+        known.add(it.id);
+        const key = it.col + ":" + it.id;
+        const mine = flat[key];
+        // есть мои неотправленные правки: не затираем их
+        const pending = !initial && mine && snap[key] !== stable(mine.data);
+        if (pending) return;
+        if (it.deleted) {
+          if (mine) changed = true;
+          applyRemote(it);
+          delete snap[key];
+          return;
+        }
+        const s = stable(it.data);
+        if (snap[key] === s && !initial) return;
+        applyRemote(it);
+        snap[key] = s;
+        changed = true;
+      });
+      setSnap(snap);
+      try { localStorage.setItem(SINCE_KEY, String(Math.max(0, res.now - 2000))); } catch (e) {}
+      lastKnownIds = known;
+      if (changed) { persist(); afterRemoteChange(); }
+    }
+
+    function afterRemoteChange() {
+      const cur = stack[stack.length - 1];
+      if (cur.name !== "gifts") render();
+    }
+
+    async function pushDiff(silent) {
+      const flat = flatten(), snap = getSnap();
+      const ops = [];
+      Object.keys(flat).forEach(key => {
+        const rec = flat[key];
+        if (snap[key] !== stable(rec.data)) ops.push({ op: "put", col: rec.col, id: rec.id, data: rec.data, label: labelFor(rec) });
+      });
+      Object.keys(snap).forEach(key => {
+        if (!(key in flat)) { const i = key.indexOf(":"); ops.push({ op: "del", col: key.slice(0, i), id: key.slice(i + 1) }); }
+      });
+      for (let i = 0; i < ops.length; i += 25) {
+        const chunk = ops.slice(i, i + 25);
+        await apiFetch("/api/batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ops: chunk, silent: !!silent })
+        });
+        const sn = getSnap();
+        chunk.forEach(o => {
+          const key = o.col + ":" + o.id;
+          if (o.op === "put") sn[key] = stable(o.data); else delete sn[key];
+        });
+        setSnap(sn);
+      }
+    }
+
+    async function uploadPhoto(ownerId, id, full, thumb, ts) {
+      await apiFetch("/api/photo?owner=" + encodeURIComponent(ownerId) + "&id=" + encodeURIComponent(id) +
+        "&ts=" + ts + "&tl=" + thumb.size, {
+        method: "POST",
+        headers: { "Content-Type": "application/octet-stream" },
+        body: new Blob([thumb, full])
+      });
+    }
+
+    // Фото, добавленные раньше на этом устройстве, переносим на сервер
+    async function migrateLocalPhotos() {
+      if (localStorage.getItem("photos_migrated_v1")) return;
+      let all = [];
+      try { all = await tx("readonly", s => s.getAll()); } catch (e) { all = []; }
+      for (const p of all) {
+        try {
+          const thumb = await resizeImage(p.blob, 360, 0.75);
+          await uploadPhoto(p.tripId, p.id, p.blob, thumb, p.ts || Date.now());
+          await delPhoto(p.id);
+        } catch (e) { return; }
+      }
+      try { localStorage.setItem("photos_migrated_v1", "1"); } catch (e) {}
+    }
+
+    async function initialSync() {
+      await pull(true);
+      applySeeds(lastKnownIds);
+      await migrateLocalPhotos();
+      await pushDiff(true);
+      localStorage.setItem(INIT_KEY, "1");
+      afterRemoteChange();
+    }
+
+    let syncing = false, again = false;
+    async function syncNow() {
+      if (!SYNC_ON) return;
+      if (syncing) { again = true; return; }
+      syncing = true;
+      setSyncUI("busy");
+      try {
+        if (!localStorage.getItem(INIT_KEY)) await initialSync();
+        else { await pull(false); await pushDiff(false); }
+        lastSyncError = "";
+        setSyncUI("ok");
+      } catch (e) {
+        const code = String(e && e.message || "");
+        lastSyncError = code;
+        setSyncUI(code === "401" || code === "403" ? "denied" : "err");
+      } finally {
+        syncing = false;
+        if (again) { again = false; setTimeout(syncNow, 300); }
+      }
+    }
+
+    function setSyncUI(kind) {
+      const el = document.getElementById("syncdot");
+      if (!el) return;
+      const map = {
+        ok: ["#5fd68a", "синхронизировано"], busy: ["#ffc94d", "синхронизация…"],
+        err: ["#ff5c6c", "нет связи"], denied: ["#ff5c6c", "нет доступа"]
+      };
+      const m = map[kind];
+      el.innerHTML = "";
+      el.append(h("span", { class: "sd", style: "background:" + m[0] }), m[1]);
+      el.dataset.kind = kind;
+    }
+
+    function startSync() {
+      const el = document.getElementById("syncdot");
+      if (el) el.onclick = () => {
+        const k = el.dataset.kind;
+        if (k === "denied") toast("Нет доступа: проверь Telegram ID в настройках сервера или открой приложение заново", 4000);
+        else if (k === "err") toast("Нет связи с сервером" + (lastSyncError ? " (" + lastSyncError + ")" : ""), 3000);
+        else toast("Всё синхронизировано ✨", 1500);
+        syncNow();
+      };
+      syncNow();
+      setInterval(() => { if (!document.hidden) syncNow(); }, 12000);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) syncNow(); });
+    }
+
+    // Работа с фото: на сервере (если подключён) или на устройстве
+    const photoApi = {
+      async list(ownerId) {
+        if (REMOTE) { const r = await apiFetch("/api/photos?owner=" + encodeURIComponent(ownerId)); return (await r.json()).photos || []; }
+        const l = await getPhotos(ownerId);
+        return l.map(p => ({ id: p.id, ts: p.ts }));
+      },
+      async url(id, size) {
+        if (!REMOTE) {
+          const rec = await tx("readonly", s => s.get(id));
+          return URL.createObjectURL(rec.blob);
+        }
+        const path = "/api/photo/" + encodeURIComponent(id) + "?size=" + size;
+        const key = API_BASE + path;
+        let resp = null, cache = null;
+        try { cache = await caches.open("isa-photos-v1"); resp = await cache.match(key); } catch (e) {}
+        if (!resp) {
+          resp = await apiFetch(path);
+          if (cache) { try { await cache.put(key, resp.clone()); } catch (e) {} }
+        }
+        return URL.createObjectURL(await resp.blob());
+      },
+      async add(ownerId, file) {
+        if (!REMOTE) {
+          const blob = await resizeImage(file, 1280);
+          await putPhoto({ id: uid(), tripId: ownerId, blob: blob, ts: Date.now() });
+          return;
+        }
+        const full = await resizeImage(file, 1280, 0.82);
+        const thumb = await resizeImage(file, 360, 0.75);
+        await uploadPhoto(ownerId, uid(), full, thumb, Date.now());
+      },
+      async remove(id) {
+        if (REMOTE) await apiFetch("/api/photo/" + encodeURIComponent(id), { method: "DELETE" });
+        else await delPhoto(id);
+      },
+      notify(count, label) {
+        apiFetch("/api/notify", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: "photos", count: count, label: label })
+        }).catch(() => {});
+      }
+    };
 
     // =====================================================================
     //   ФОТО (IndexedDB)
