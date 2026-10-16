@@ -4,307 +4,248 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <title>Для нас</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=Manrope:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    /* Шрифт Corbel: файлы лежат рядом с index.html */
+    @font-face { font-family: "Corbel"; src: url("corbel.ttf")  format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Corbel"; src: url("corbelb.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Corbel"; src: url("corbeli.ttf") format("truetype"); font-weight: 400; font-style: italic; font-display: swap; }
+    @font-face { font-family: "Corbel"; src: url("corbelz.ttf") format("truetype"); font-weight: 700; font-style: italic; font-display: swap; }
+
     :root {
-      --bg1: #1a0f2e; --bg2: #3b1747; --bg3: #5a1f4a;
-      --text: #fdf4f7; --hint: rgba(253, 244, 247, .62);
-      --glass: rgba(255, 255, 255, .08); --glass-strong: rgba(255, 255, 255, .14);
-      --line: rgba(255, 255, 255, .14);
-      --accent1: #ff9eb5; --accent2: #f7c98b;
-      --red: #ff5c6c; --yellow: #ffc94d; --green: #5fd68a;
-      --serif: "Playfair Display", Georgia, "Times New Roman", serif;
-      --sans: "Manrope", -apple-system, "Segoe UI", Roboto, sans-serif;
+      --bg: #0e1013;
+      --surface: rgba(24, 27, 33, .88);
+      --surface2: #21252d;
+      --line: rgba(255, 255, 255, .09);
+      --text: #ece8e1;
+      --hint: #8f939c;
+      --accent: #c8a96a;
+      --accent-ink: #1b1507;
+      --red: #d4574f;
+      --yellow: #d9a23a;
+      --green: #4fa774;
+      --sans: "Corbel", "Segoe UI", -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { background: var(--bg1); }
+    html { background: var(--bg); }
     body {
-      margin: 0; padding: 22px 16px 110px; min-height: 100vh;
-      font-family: var(--sans); color: var(--text);
-      background:
-        radial-gradient(520px 420px at 105% -5%, rgba(255, 158, 181, .35), transparent 60%),
-        radial-gradient(480px 460px at -10% 45%, rgba(247, 201, 139, .20), transparent 60%),
-        radial-gradient(520px 520px at 110% 100%, rgba(140, 90, 255, .30), transparent 60%),
-        linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg3) 100%);
-      background-attachment: fixed;
+      margin: 0; padding: 20px 16px 110px; min-height: 100vh;
+      font-family: var(--sans); font-size: 16px; line-height: 1.4; color: var(--text);
+      font-variant-numeric: lining-nums;
+      background: transparent;
     }
-    #app { position: relative; z-index: 1; animation: fade .35s ease both; }
-    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    button { font-family: var(--sans); }
 
-    /* Летающие сердечки на фоне */
-    .floaters { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .floaters span {
-      position: absolute; bottom: -40px; color: rgba(255, 158, 181, .28);
-      animation: floatUp linear infinite;
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-115vh) rotate(40deg); opacity: 0; }
-    }
-    @media (prefers-reduced-motion: reduce) { .floaters { display: none; } }
+    /* Фон */
+    #bg { position: fixed; inset: 0; z-index: 0; background: linear-gradient(160deg, #171a20, #0b0c0f); background-size: cover; background-position: center; }
+    #bg.has-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(8, 9, 11, .62), rgba(8, 9, 11, .84)); }
+    #app { position: relative; z-index: 1; animation: fade .25s ease both; }
+    @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-    h1, h2 { font-family: var(--serif); font-weight: 700; margin: 0; }
-    .hero { text-align: center; padding: 10px 6px 16px; }
-    .hero .orn { color: var(--accent2); letter-spacing: 8px; font-size: 14px; opacity: .9; cursor: pointer; display: inline-block; }
-    .hero h1 {
-      font-style: italic; font-size: 24px; line-height: 1.35; margin: 12px 0 0;
-      background: linear-gradient(90deg, #ffd9e2, #ffb3c6 45%, #f7c98b);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .page-title { font-size: 26px; font-style: italic; margin: 4px 0 6px; }
-    .sub { color: var(--hint); font-size: 14px; margin-bottom: 18px; line-height: 1.4; }
+    /* Верхняя строка */
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; min-height: 36px; }
+    .brand { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .topactions { display: flex; gap: 8px; align-items: center; }
+    .sync { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--hint); background: transparent; border: 0; padding: 6px 4px; }
+    .sync .sd { width: 7px; height: 7px; border-radius: 50%; }
+    .iconbtn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--text); display: grid; place-items: center; padding: 0; }
+    .iconbtn svg { width: 18px; height: 18px; }
+    .backlink { display: inline-flex; align-items: center; gap: 4px; color: var(--hint); background: none; border: 0; font-size: 14px; padding: 4px 0 12px; }
+
+    h1, h2 { margin: 0; font-weight: 700; }
+    h1.lead { font-size: 21px; line-height: 1.4; font-weight: 400; margin: 0 0 20px; }
+    .page-title { font-size: 26px; line-height: 1.2; margin: 2px 0 6px; }
+    .sub { color: var(--hint); font-size: 14px; margin-bottom: 18px; line-height: 1.45; }
 
     /* Счётчик */
-    .together {
-      text-align: center; padding: 22px 16px 20px; margin-bottom: 18px; border-radius: 26px;
-      background: linear-gradient(145deg, rgba(255, 158, 181, .22), rgba(247, 201, 139, .12));
-      border: 1px solid rgba(255, 255, 255, .22);
-      -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-      box-shadow: 0 14px 34px rgba(0, 0, 0, .25);
-    }
-    .together .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--hint); font-weight: 600; }
-    .together .num {
-      font: italic 700 64px/1.05 var(--serif); margin: 6px 0 2px;
-      background: linear-gradient(90deg, #ffd9e2, #ff9eb5 50%, #f7c98b);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .together .days { font-size: 16px; font-weight: 600; }
-    .together .ymd { color: var(--hint); font-size: 14px; margin-top: 6px; }
-    .together .next { margin-top: 12px; font-size: 13px; color: var(--accent2); font-weight: 600; }
-    .beat { display: inline-block; animation: beat 1.4s ease-in-out infinite; }
-    @keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.18); } }
+    .together { padding: 20px 18px; margin-bottom: 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    .together .lbl { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--hint); font-weight: 700; }
+    .together .bignum { margin: 8px 0 4px; display: flex; align-items: baseline; }
+    .together .num { font-size: 58px; line-height: 1; font-weight: 700; letter-spacing: -.02em; }
+    .together .unit { font-size: 18px; color: var(--accent); margin-left: 10px; }
+    .together .ymd { color: var(--hint); font-size: 15px; }
+    .together .next { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; color: var(--hint); }
+
+    /* Приглашение */
+    .invite { padding: 16px 18px; margin-bottom: 18px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    .invite .lbl { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .invite .name { font-weight: 700; font-size: 17px; margin: 6px 0 4px; }
 
     /* Карточки */
     .card {
       display: flex; align-items: center; gap: 14px;
-      background: var(--glass); border: 1px solid var(--line);
-      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-      border-radius: 20px; padding: 14px 16px; margin-bottom: 12px; cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
-      transition: transform .15s ease, background .15s ease, opacity .2s;
-      animation: rise .45s ease both;
+      background: var(--surface); border: 1px solid var(--line);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+      transition: background .15s ease, opacity .2s;
+      animation: rise .35s ease both;
     }
-    .card:active { transform: scale(.98); background: var(--glass-strong); }
+    .card:active { background: var(--surface2); }
     .card.used { opacity: .5; }
-    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-    .tile {
-      width: 52px; height: 52px; border-radius: 16px; flex: none;
-      display: grid; place-items: center; font-size: 26px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .35);
-    }
-    .tile.sm { width: 42px; height: 42px; font-size: 21px; border-radius: 13px; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .ico { width: 42px; height: 42px; border-radius: 11px; flex: none; display: grid; place-items: center; background: var(--surface2); border: 1px solid var(--line); color: var(--accent); }
+    .ico.sm { width: 36px; height: 36px; border-radius: 10px; }
+    .ico.on { border-color: rgba(200, 169, 106, .55); }
+    .ico svg { width: 21px; height: 21px; }
+    .ico.sm svg { width: 18px; height: 18px; }
     .card .body { flex: 1; min-width: 0; }
     .card .name { font-weight: 700; font-size: 16px; line-height: 1.3; word-break: break-word; }
     .card .meta { color: var(--hint); font-size: 13px; margin-top: 3px; }
-    .card .arrow { color: var(--hint); font-size: 22px; }
+    .card .arrow { color: var(--hint); display: grid; place-items: center; }
+    .card .arrow svg { width: 18px; height: 18px; }
     .note { color: var(--hint); font-size: 14px; margin-top: 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
     .empty { color: var(--hint); text-align: center; padding: 34px 10px; line-height: 1.5; }
-    .empty .big { font-size: 34px; display: block; margin-bottom: 6px; }
 
     /* Кнопки */
     .fab {
       position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
-      padding: 16px; font: 700 16px var(--sans); border: 0; border-radius: 18px;
-      color: #3a1030; background: linear-gradient(135deg, var(--accent2), var(--accent1));
-      box-shadow: 0 10px 28px rgba(255, 158, 181, .38); z-index: 5;
+      padding: 15px; font-size: 16px; font-weight: 700; border: 0; border-radius: 14px;
+      color: var(--accent-ink); background: var(--accent); z-index: 5;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .35);
     }
-    .fab:active { transform: scale(.98); }
-    .btn {
-      padding: 13px 16px; font: 700 15px var(--sans); border: 0; border-radius: 14px;
-      color: #3a1030; background: linear-gradient(135deg, var(--accent2), var(--accent1));
-    }
-    .btn.ghost { background: var(--glass-strong); color: var(--text); border: 1px solid var(--line); }
-    .btn.danger { background: linear-gradient(135deg, #ff7a85, #e0364a); color: #fff; }
-    .btn.small { padding: 9px 13px; font-size: 13px; border-radius: 12px; white-space: nowrap; }
+    .fab:active { opacity: .88; }
+    .btn { padding: 13px 16px; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; color: var(--accent-ink); background: var(--accent); }
+    .btn:active { opacity: .88; }
+    .btn.ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--line); }
+    .btn.danger { background: #a63a35; color: #fff; }
+    .btn.small { padding: 9px 13px; font-size: 13px; border-radius: 10px; white-space: nowrap; }
+    .btn.wide { width: 100%; }
     .row { display: flex; gap: 10px; margin-bottom: 8px; }
     .row .btn { flex: 1; }
-    .section-title {
-      font-family: var(--serif); font-style: italic; font-size: 19px; margin: 24px 0 10px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
-    .badge {
-      display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent2), var(--accent1)); color: #3a1030; margin-top: 6px;
-    }
-    .linkbtn { background: none; border: 0; color: var(--hint); font: 600 13px var(--sans); text-decoration: underline; padding: 10px; width: 100%; }
+    .section-title { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--hint); font-weight: 700; margin: 26px 0 10px; display: flex; align-items: center; gap: 10px; }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 8px; background: rgba(200, 169, 106, .16); color: var(--accent); margin-top: 6px; }
+    .linkbtn { background: none; border: 0; color: var(--hint); font-size: 13px; text-decoration: underline; padding: 10px; width: 100%; }
 
     /* Цветовые метки */
-    .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
-    .dot.red { background: var(--red); box-shadow: 0 0 12px var(--red); }
-    .dot.yellow { background: var(--yellow); box-shadow: 0 0 12px var(--yellow); }
-    .dot.green { background: var(--green); box-shadow: 0 0 12px var(--green); }
-    .legend {
-      display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--hint);
-      background: var(--glass); border: 1px solid var(--line); border-radius: 16px;
-      padding: 12px 14px; margin-bottom: 16px;
-    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+    .dot.red { background: var(--red); }
+    .dot.yellow { background: var(--yellow); }
+    .dot.green { background: var(--green); }
+    .legend { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--hint); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
     .legend div { display: flex; align-items: center; gap: 10px; }
     .chips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 2px; scrollbar-width: none; }
     .chips::-webkit-scrollbar { display: none; }
-    .chip {
-      flex: none; padding: 9px 15px; border-radius: 20px; border: 1px solid var(--line);
-      background: var(--glass); color: var(--text); font: 600 14px var(--sans);
-    }
-    .chip.active { background: linear-gradient(135deg, var(--accent2), var(--accent1)); color: #3a1030; border-color: transparent; }
+    .chip { flex: none; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font-size: 14px; }
+    .chip.active { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 700; }
 
-    /* Чекбокс */
-    .check {
-      width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center;
-      border: 2px solid var(--accent1); color: #3a1030; font-weight: 800; font-size: 16px; background: transparent;
-    }
-    .check.on { background: linear-gradient(135deg, var(--accent2), var(--accent1)); border-color: transparent; }
+    /* Галочка */
+    .check { width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center; border: 1.5px solid var(--hint); color: var(--accent-ink); background: transparent; padding: 0; }
+    .check.on { background: var(--accent); border-color: var(--accent); }
+    .check svg { width: 16px; height: 16px; }
     .strike { text-decoration: line-through; opacity: .6; }
 
     /* Причины */
-    .reason-stage { text-align: center; padding: 10px 0 6px; }
-    .reason-heart {
-      width: 150px; height: 150px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .3);
-      font-size: 70px; line-height: 1; cursor: pointer; color: #fff;
-      background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .35), rgba(255, 158, 181, .35) 60%, rgba(255, 92, 140, .45));
-      box-shadow: 0 14px 40px rgba(255, 92, 140, .4); animation: beat 1.6s ease-in-out infinite;
-    }
-    .reason-heart:active { transform: scale(.94); }
-    .reason-card {
-      margin: 22px 0 8px; padding: 22px 18px; border-radius: 22px; min-height: 130px;
-      background: var(--glass); border: 1px solid var(--line);
-      display: flex; flex-direction: column; justify-content: center; gap: 8px;
-    }
-    .reason-card.pop { animation: pop .5s cubic-bezier(.2, 1.4, .4, 1); }
-    @keyframes pop { from { transform: scale(.85) translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
-    .reason-num { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); font-weight: 700; min-height: 15px; }
-    .reason-text { font: italic 600 21px/1.4 var(--serif); }
+    .reason-card { margin: 4px 0 14px; padding: 22px 18px; border-radius: 14px; min-height: 140px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent); display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    .reason-card.pop { animation: rise .35s ease; }
+    .reason-num { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; min-height: 15px; }
+    .reason-text { font-size: 22px; line-height: 1.4; font-style: italic; }
 
     /* Фото */
     .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .photo { aspect-ratio: 1; border-radius: 14px; overflow: hidden; cursor: pointer; background: var(--glass); border: 1px solid var(--line); }
+    .photo { aspect-ratio: 1; border-radius: 10px; overflow: hidden; cursor: pointer; background: var(--surface2); border: 1px solid var(--line); }
     .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .viewer { position: fixed; inset: 0; background: rgba(8, 3, 16, .96); z-index: 30; display: flex; flex-direction: column; animation: fade .2s ease; }
+    .viewer { position: fixed; inset: 0; background: rgba(6, 7, 9, .97); z-index: 30; display: flex; flex-direction: column; animation: fade .2s ease; }
     .viewer .stage { flex: 1; display: grid; place-items: center; padding: 12px; min-height: 0; }
-    .viewer img { max-width: 100%; max-height: 100%; border-radius: 12px; }
+    .viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; }
     .viewer .bar { display: flex; gap: 8px; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
     .viewer .bar .btn { flex: 1; }
     .counter { text-align: center; color: var(--hint); font-size: 13px; padding-top: 14px; }
 
     /* Окно формы */
-    .overlay {
-      position: fixed; inset: 0; background: rgba(8, 3, 16, .6); z-index: 20;
-      display: flex; align-items: flex-end; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-    }
-    .sheet {
-      width: 100%; max-height: 92vh; overflow-y: auto;
-      background: linear-gradient(180deg, #2b1640, #20102f);
-      border: 1px solid var(--line); border-bottom: 0;
-      border-radius: 26px 26px 0 0; padding: 22px 18px calc(24px + env(safe-area-inset-bottom));
-      animation: slide .3s ease;
-    }
-    @keyframes slide { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-    .sheet h3 { margin: 0 0 6px; font: italic 700 22px var(--serif); }
-    label { display: block; font-size: 13px; font-weight: 600; color: var(--hint); margin: 14px 0 6px; }
-    input, textarea, select {
-      width: 100%; padding: 13px 14px; font: 500 16px var(--sans); border-radius: 14px;
-      border: 1px solid var(--line); background: rgba(255, 255, 255, .07); color: var(--text);
-      color-scheme: dark; outline: none;
-    }
-    input:focus, textarea:focus, select:focus { border-color: var(--accent1); }
-    input::placeholder, textarea::placeholder { color: rgba(253, 244, 247, .35); }
-    select option { background: #2b1640; color: #fff; }
+    .overlay { position: fixed; inset: 0; background: rgba(6, 7, 9, .62); z-index: 20; display: flex; align-items: flex-end; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+    .sheet { width: 100%; max-height: 92vh; overflow-y: auto; background: #181b21; border: 1px solid var(--line); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 22px 18px calc(24px + env(safe-area-inset-bottom)); animation: slide .25s ease; }
+    @keyframes slide { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .sheet h3 { margin: 0 0 6px; font-size: 21px; font-weight: 700; }
+    label { display: block; font-size: 13px; color: var(--hint); margin: 14px 0 6px; }
+    input, textarea, select { width: 100%; padding: 13px 14px; font-family: var(--sans); font-size: 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface2); color: var(--text); color-scheme: dark; outline: none; }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    input::placeholder, textarea::placeholder { color: rgba(236, 232, 225, .32); }
+    select option { background: #21252d; color: #fff; }
     textarea { min-height: 96px; resize: vertical; }
     .levels { display: flex; gap: 8px; }
-    .level {
-      flex: 1; padding: 12px 6px; border-radius: 14px; border: 2px solid transparent;
-      background: rgba(255, 255, 255, .07); color: var(--text); font: 600 13px var(--sans); text-align: center;
-    }
-    .level.sel.red { border-color: var(--red); background: rgba(255, 92, 108, .14); }
-    .level.sel.yellow { border-color: var(--yellow); background: rgba(255, 201, 77, .14); }
-    .level.sel.green { border-color: var(--green); background: rgba(95, 214, 138, .14); }
+    .level { flex: 1; padding: 12px 6px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface2); color: var(--text); font-size: 13px; text-align: center; }
+    .level.sel.red { border-color: var(--red); }
+    .level.sel.yellow { border-color: var(--yellow); }
+    .level.sel.green { border-color: var(--green); }
     .actions { display: flex; gap: 10px; margin-top: 22px; }
     .actions .btn { flex: 1; }
-    .toast {
-      position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 60; max-width: 90%; text-align: center;
-      background: rgba(255, 255, 255, .95); color: #3a1030; padding: 10px 18px;
-      border-radius: 20px; font: 700 14px var(--sans); box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
-    }
+    .toast { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 60; max-width: 90%; text-align: center; background: #ece8e1; color: #15120a; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 20px rgba(0, 0, 0, .4); }
+
+    /* Выбор фона */
+    .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .swatch { aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--line); color: #fff; font-size: 11px; display: flex; align-items: flex-end; justify-content: center; padding: 6px 2px; }
+    .swatch.sel { border-color: var(--accent); }
+    .swatch.photo-sw { background-size: cover; background-position: center; }
 
     /* PIN */
     .pin-wrap { text-align: center; padding-top: 10px; }
-    .pin-wrap .lock { font-size: 44px; }
+    .pin-wrap .lock { color: var(--accent); display: grid; place-items: center; }
+    .pin-wrap .lock svg { width: 34px; height: 34px; }
     .pin-dots { display: flex; justify-content: center; gap: 16px; margin: 18px 0 26px; }
-    .pin-dots span { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--accent1); }
-    .pin-dots span.on { background: var(--accent1); box-shadow: 0 0 12px var(--accent1); }
+    .pin-dots span { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--accent); }
+    .pin-dots span.on { background: var(--accent); }
     .pin-dots.shake { animation: shake .4s; }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
-    .key {
-      height: 64px; border-radius: 50%; border: 1px solid var(--line); background: var(--glass);
-      color: var(--text); font: 600 24px var(--sans);
-    }
-    .key:active { background: var(--glass-strong); transform: scale(.94); }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 280px; margin: 0 auto; }
+    .key { height: 58px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font-size: 22px; }
+    .key:active { background: var(--surface2); }
     .key.empty { visibility: hidden; }
 
-    /* Праздничные сердечки и приветствие */
-    .burst { position: fixed; bottom: 25%; z-index: 45; pointer-events: none; animation: burstUp 1.9s ease-out forwards; }
-    @keyframes burstUp { 0% { transform: translateY(0) scale(.6); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-48vh) scale(1.2) rotate(25deg); opacity: 0; } }
-    .welcome {
-      position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 30px;
-      background:
-        radial-gradient(520px 420px at 105% -5%, rgba(255, 158, 181, .4), transparent 60%),
-        radial-gradient(520px 520px at -10% 105%, rgba(140, 90, 255, .35), transparent 60%),
-        linear-gradient(160deg, var(--bg1), var(--bg2) 55%, var(--bg3));
-      animation: fade .6s ease;
-    }
-    .welcome .heart { font-size: 84px; animation: beat 1.4s ease-in-out infinite; }
-    .welcome h1 {
-      font-style: italic; font-size: 34px; margin: 18px 0 10px; opacity: 0; animation: rise .9s .5s ease forwards;
-      background: linear-gradient(90deg, #ffd9e2, #ffb3c6 45%, #f7c98b);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .welcome p { font: italic 500 20px/1.5 var(--serif); margin: 0 0 34px; opacity: 0; animation: rise .9s 1.1s ease forwards; max-width: 320px; }
-    .welcome .btn { padding: 16px 34px; font-size: 16px; border-radius: 18px; opacity: 0; animation: rise .9s 1.7s ease forwards; box-shadow: 0 10px 28px rgba(255, 158, 181, .38); }
+    /* Приветствие */
+    .welcome { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; background: linear-gradient(160deg, #171a20, #0a0b0d); animation: fade .5s ease; }
+    .welcome .w-label { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 22px; }
+    .welcome h1 { font-size: 36px; line-height: 1.15; margin: 0 0 12px; }
+    .welcome p { font-size: 19px; line-height: 1.5; margin: 0 0 36px; color: var(--hint); font-style: italic; max-width: 320px; }
+    .welcome .btn { padding: 15px 38px; font-size: 16px; border-radius: 12px; }
   </style>
 </head>
 <body>
+  <div id="bg"></div>
   <div id="app"></div>
 
   <script>
-    const tg = window.Telegram.WebApp;
+    const tg = (window.Telegram && window.Telegram.WebApp) || {
+      initData: "", initDataUnsafe: {},
+      ready() {}, expand() {}, setHeaderColor() {}, setBackgroundColor() {},
+      BackButton: { onClick() {}, show() {}, hide() {} },
+      HapticFeedback: { impactOccurred() {} },
+      openLink(u) { window.open(u, "_blank"); },
+      openTelegramLink(u) { window.open(u, "_blank"); }
+    };
     tg.ready();
     tg.expand();
-    try { tg.setHeaderColor("#1a0f2e"); tg.setBackgroundColor("#1a0f2e"); } catch (e) {}
 
     // =====================================================================
-    //   СОДЕРЖИМОЕ, КОТОРОЕ МОЖНО МЕНЯТЬ В КОДЕ
+    //   НАСТРОЙКИ И СОДЕРЖИМОЕ (можно менять в коде)
     // =====================================================================
     const START = "2025-08-13"; // дата начала отношений (ГГГГ-ММ-ДД)
 
-    // Адрес твоего сервера (Cloudflare Worker), например "https://diary-api.твойник.workers.dev"
+    // Адрес сервера (Cloudflare Worker), например "https://diary-api.твой-ник.workers.dev"
     // Пока пусто: приложение работает только на этом устройстве, без синхронизации.
-    const API_URL = "";
+    const API_URL = "https://spring-resonance-6de0diary-api.iskaimiaminov.workers.dev";
     const API_BASE = API_URL.replace(/\/+$/, "");
     const SYNC_ON = !!API_BASE && !!tg.initData;
     const REMOTE = SYNC_ON;
 
-    const WELCOME_TITLE = "Привет, Макош!";
+    // Имена (менять только здесь)
+    const HIM = "Иса";
+    const HER = "Жанм";
+
+    const WELCOME_TITLE = "Привет, " + HER + "!";
     const WELCOME_TEXT = "Добро пожаловать в наш виртуальный дневник";
 
     const SECTIONS = {
-      dates:    { emoji: "🗓️", title: "Важные даты",                   grad: "linear-gradient(135deg,#ffb88c,#ff7a8a)" },
-      trips:    { emoji: "🧳", title: "Наши поездки с воспоминаниями", grad: "linear-gradient(135deg,#7ad7f0,#6f86ff)" },
-      our:      { emoji: "🫶", title: "Наши предпочтения",             grad: "linear-gradient(135deg,#ff9eb5,#c77dff)" },
-      isa:      { emoji: "🌙", title: "Предпочтения Исы",              grad: "linear-gradient(135deg,#7c8cff,#4b4fd6)" },
-      makosh:   { emoji: "🌷", title: "Предпочтения Макош",            grad: "linear-gradient(135deg,#ffc2d9,#ff6fa5)" },
-      reasons:  { emoji: "💗", title: "Почему я тебя люблю",           grad: "linear-gradient(135deg,#ff8fb1,#ff4f7b)" },
-      coupons:  { emoji: "🎟️", title: "Купоны любви",                  grad: "linear-gradient(135deg,#ffd27a,#ff9a5a)" },
-      letters:  { emoji: "💌", title: "Письма в будущее",              grad: "linear-gradient(135deg,#b89cff,#7f6bff)" },
-      wishes:   { emoji: "🌍", title: "Хотим вместе",                  grad: "linear-gradient(135deg,#6fe3c1,#3aa6d9)" },
-      gifts:    { emoji: "🎁", title: "Идеи подарков",                 grad: "linear-gradient(135deg,#ff9a9e,#fad0c4)" },
-      playlist: { emoji: "🎧", title: "Наш плейлист",                  grad: "linear-gradient(135deg,#a18cd1,#fbc2eb)" }
+      dates:   { icon: "calendar", title: "Важные даты" },
+      trips:   { icon: "suitcase", title: "Наши поездки с воспоминаниями" },
+      our:     { icon: "rings",    title: "Наши предпочтения" },
+      isa:     { icon: "user",     title: "Предпочтения Исы" },
+      makosh:  { icon: "user",     title: "Предпочтения " + HER },
+      wishes:  { icon: "compass",  title: "Хотим вместе" },
+      gifts:   { icon: "gift",     title: "Идеи подарков" },
+      reasons: { icon: "heart",    title: "Почему я тебя люблю" },
+      coupons: { icon: "ticket",   title: "Купоны любви" },
+      letters: { icon: "mail",     title: "Письма в будущее" }
     };
 
     const LEVELS = {
@@ -314,7 +255,15 @@
     };
     const LEVEL_ORDER = { red: 0, yellow: 1, green: 2 };
 
-    // Причины, почему люблю (новые можно добавлять и в самом приложении)
+    // Варианты фона (выбирает только Иса; можно ещё загрузить своё фото)
+    const BG_PRESETS = [
+      { id: "graphite", name: "Графит", css: "linear-gradient(160deg,#171a20,#0b0c0f)", top: "#14171c" },
+      { id: "night",    name: "Ночь",   css: "linear-gradient(160deg,#142033,#070a11)", top: "#101a2a" },
+      { id: "wine",     name: "Бордо",  css: "linear-gradient(160deg,#2a1219,#0c0608)", top: "#220f15" },
+      { id: "forest",   name: "Хвоя",   css: "linear-gradient(160deg,#11251d,#060c09)", top: "#0e1f18" },
+      { id: "coal",     name: "Уголь",  css: "#0a0a0b",                                  top: "#0a0a0b" }
+    ];
+
     const REASONS = [
       "Твоя улыбка, которая поднимает мне настроение",
       "Твои глаза, которые дают видение будущего",
@@ -327,40 +276,35 @@
       "Твоё воспитание, которое подаёт пример"
     ];
 
-    // Купоны (id менять не нужно, по нему запоминается, что купон использован)
+    // id менять не нужно: по нему запоминается, что купон использован
     const COUPONS = [
-      { id: "c_money",      emoji: "💸", title: "Купон на деньги" },
-      { id: "c_kiss",       emoji: "💋", title: "Купон на поцелуй" },
-      { id: "c_hugs",       emoji: "🤗", title: "Купон на обнимашки" },
-      { id: "c_sex",        emoji: "🔥", title: "Купон на секс" },
-      { id: "c_restaurant", emoji: "🍽️", title: "Купон на поход в ресторан" },
-      { id: "c_park",       emoji: "🌳", title: "Купон на прогулку по парку" },
-      { id: "c_massage",    emoji: "💆", title: "Купон на массаж" },
-      { id: "c_movie",      emoji: "🎬", title: "Купон на просмотр фильма" }
+      { id: "c_money",      title: "Купон на деньги" },
+      { id: "c_kiss",       title: "Купон на поцелуй" },
+      { id: "c_hugs",       title: "Купон на обнимашки" },
+      { id: "c_sex",        title: "Купон на секс" },
+      { id: "c_restaurant", title: "Купон на поход в ресторан" },
+      { id: "c_park",       title: "Купон на прогулку по парку" },
+      { id: "c_massage",    title: "Купон на массаж" },
+      { id: "c_movie",      title: "Купон на просмотр фильма" }
     ];
 
-    // Плейлист
-    const SONGS = [
-      { id: "s1", title: "Быть с тобой", artist: "Мартин" },
-      { id: "s2", title: "Ozin gana",    artist: "Молданазар" },
-      { id: "s3", title: "Города",       artist: "Thekitchensongs" }
-    ];
-
-    // Даты, которые добавятся в приложение при первом запуске
+    // Даты, которые добавятся при первом запуске
     const SEED_DATES = [
-      { id: "seed_anniv",  title: "Наша годовщина 💞",     date: START,        repeat: "yearly", note: "День, когда всё началось" },
-      { id: "seed_bd_isa", title: "День рождения Исы",     date: "2005-08-16", repeat: "yearly", note: "" },
-      { id: "seed_bd_mak", title: "День рождения Макош",   date: "2006-03-20", repeat: "yearly", note: "" }
+      { id: "seed_anniv",  title: "Наша годовщина",             date: START,        repeat: "yearly", note: "День, когда всё началось" },
+      { id: "seed_bd_isa", title: "День рождения Исы",          date: "2005-08-16", repeat: "yearly", note: "" },
+      { id: "seed_bd_mak", title: "День рождения " + HER,       date: "2006-03-20", repeat: "yearly", note: "" }
     ];
 
-    // Письма, которые будут лежать в приложении с самого начала (можно писать и в самом приложении).
-    // Пример: { id: "seed_l1", title: "Открой в годовщину", from: "Иса", openDate: "2026-08-13", text: "Текст письма" }
+    // Письма, которые лежат в приложении с самого начала.
+    // Пример: { id: "seed_l1", title: "Открой в годовщину", from: "isa", openDate: "2026-08-13", text: "Текст письма" }
+    // from: "isa" (от Исы) или "her" (от второго человека)
     const SEED_LETTERS = [];
 
     // =====================================================================
     //   ДАННЫЕ
     // =====================================================================
     const KEY = "isa_makosh_v1";
+    const SNAP_KEY = "sync_snap_v1", SINCE_KEY = "sync_since_v1", INIT_KEY = "sync_init_v1";
 
     function defaultState() {
       const trips = [];
@@ -369,9 +313,20 @@
       }
       return {
         dates: [], trips: trips, prefs: { our: [], isa: [], makosh: [] },
-        letters: [], wishes: [], gifts: [], reasons: [], coupons: [], songs: [],
-        couponUsed: {}, seeded: []
+        letters: [], wishes: [], gifts: [], reasons: [], coupons: [],
+        couponUsed: {}, seeded: [], settings: { bg: null }
       };
+    }
+
+    function isHer(v) { return v === "her" || v === "Макош" || v === HER; }
+
+    function migrate(st) {
+      st.letters.forEach(l => { if (l.from === "Иса") l.from = "isa"; else if (isHer(l.from)) l.from = "her"; });
+      st.gifts.forEach(g => { if (g.for === "Иса") g.for = "isa"; else if (isHer(g.for)) g.for = "her"; });
+      st.dates.forEach(d => {
+        if (d.id === "seed_bd_mak" && d.title === "День рождения Макош") d.title = "День рождения " + HER;
+        if (d.id === "seed_anniv" && d.title === "Наша годовщина 💞") d.title = "Наша годовщина";
+      });
     }
 
     function load() {
@@ -381,12 +336,15 @@
         if (raw) {
           const s = JSON.parse(raw);
           const st = Object.assign({}, d, s);
+          delete st.songs;
           st.prefs = Object.assign(d.prefs, s.prefs || {});
-          ["dates", "trips", "letters", "wishes", "gifts", "reasons", "coupons", "songs", "seeded"].forEach(k => {
+          ["dates", "trips", "letters", "wishes", "gifts", "reasons", "coupons", "seeded"].forEach(k => {
             if (!Array.isArray(st[k])) st[k] = d[k];
           });
           if (!st.couponUsed || typeof st.couponUsed !== "object") st.couponUsed = {};
+          if (!st.settings || typeof st.settings !== "object") st.settings = { bg: null };
           st.trips.forEach(t => { if (typeof t.photoCount !== "number") t.photoCount = 0; if (!t.memories) t.memories = []; });
+          migrate(st);
           return st;
         }
       } catch (e) {}
@@ -415,13 +373,375 @@
       SEED_LETTERS.forEach(s => tryAdd(s, state.letters));
       if (changed) save();
     }
+    applySeeds(null);
+
+    // =====================================================================
+    //   ФОТО НА УСТРОЙСТВЕ (IndexedDB): используется, пока нет сервера
+    // =====================================================================
+    let dbPromise;
+    function db() {
+      if (!dbPromise) {
+        dbPromise = new Promise((resolve, reject) => {
+          const r = indexedDB.open("isa_makosh_photos", 1);
+          r.onupgradeneeded = () => {
+            const s = r.result.createObjectStore("photos", { keyPath: "id" });
+            s.createIndex("tripId", "tripId");
+          };
+          r.onsuccess = () => resolve(r.result);
+          r.onerror = () => reject(r.error);
+        });
+      }
+      return dbPromise;
+    }
+    function tx(mode, fn) {
+      return db().then(d => new Promise((resolve, reject) => {
+        const t = d.transaction("photos", mode);
+        const req = fn(t.objectStore("photos"));
+        t.oncomplete = () => resolve(req ? req.result : undefined);
+        t.onerror = () => reject(t.error);
+      }));
+    }
+    const putPhoto = rec => tx("readwrite", s => s.put(rec));
+    const getPhotos = ownerId => tx("readonly", s => s.index("tripId").getAll(ownerId));
+    const delPhoto = id => tx("readwrite", s => s.delete(id));
+
+    function resizeImage(file, max, quality) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * k);
+          c.height = Math.round(img.height * k);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("blob")); }, "image/jpeg", quality || 0.82);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img")); };
+        img.src = url;
+      });
+    }
+
+    // =====================================================================
+    //   ПОМОЩНИКИ
+    // =====================================================================
+    function h(tag, attrs, ...children) {
+      const e = document.createElement(tag);
+      for (const k in (attrs || {})) {
+        if (k === "class") e.className = attrs[k];
+        else if (k.startsWith("on")) e[k] = attrs[k];
+        else e.setAttribute(k, attrs[k]);
+      }
+      children.flat().forEach(c => {
+        if (c == null || c === false) return;
+        e.append(c.nodeType ? c : document.createTextNode(c));
+      });
+      return e;
+    }
+
+    const ICONS = {
+      calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+      suitcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
+      rings:    '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
+      user:     '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+      compass:  '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+      gift:     '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13M12 8c-2 0-4-1-4-3s3-2.5 4 0c1-2.5 4-2 4 0s-2 3-4 3z"/>',
+      heart:    '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+      ticket:   '<path d="M4 7h16v3.2a1.8 1.8 0 0 0 0 3.6V17H4v-3.2a1.8 1.8 0 0 0 0-3.6z"/><path d="M14 7v10" stroke-dasharray="2 2"/>',
+      mail:     '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+      lock:     '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+      check:    '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+      chevron:  '<path d="M9 6l6 6-6 6"/>',
+      back:     '<path d="M15 6l-6 6 6 6"/>',
+      pencil:   '<path d="M4 20l1-4L16 5l3 3L8 19z"/>',
+      quote:    '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/>',
+      sliders:  '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'
+    };
+    function ic(name) {
+      const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      s.setAttribute("viewBox", "0 0 24 24");
+      s.setAttribute("fill", "none");
+      s.setAttribute("stroke", "currentColor");
+      s.setAttribute("stroke-width", "1.6");
+      s.setAttribute("stroke-linecap", "round");
+      s.setAttribute("stroke-linejoin", "round");
+      s.innerHTML = ICONS[name] || "";
+      return s;
+    }
+    const iconBox = (name, cls) => h("div", { class: "ico" + (cls ? " " + cls : "") }, ic(name));
+    const arrow = () => h("div", { class: "arrow" }, ic("chevron"));
+
+    function haptic(type) { try { tg.HapticFeedback.impactOccurred(type || "light"); } catch (e) {} }
+    function openLink(url) { try { tg.openLink(url); } catch (e) { window.open(url, "_blank"); } }
+
+    function toast(text, ms) {
+      const t = h("div", { class: "toast" }, text);
+      document.body.append(t);
+      if (ms) setTimeout(() => t.remove(), ms);
+      return t;
+    }
+
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function todayISO() { const d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+    function parseISO(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+    function todayMid() { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }
+
+    function formatDate(iso) {
+      if (!iso) return "";
+      const [y, m, d] = iso.split("-");
+      return d + "." + m + "." + y;
+    }
+
+    function plural(n, forms) {
+      const a = Math.abs(n) % 100, b = a % 10;
+      if (a > 10 && a < 20) return forms[2];
+      if (b > 1 && b < 5) return forms[1];
+      if (b === 1) return forms[0];
+      return forms[2];
+    }
+
+    function daysUntil(item) {
+      if (!item.date) return null;
+      const [y, m, d] = item.date.split("-").map(Number);
+      const today = todayMid();
+      let target = new Date(y, m - 1, d);
+      if (item.repeat === "yearly") {
+        target = new Date(today.getFullYear(), m - 1, d);
+        if (target < today) target = new Date(today.getFullYear() + 1, m - 1, d);
+      }
+      return Math.round((target - today) / 86400000);
+    }
+
+    function daysLabel(n) {
+      if (n === null) return "";
+      if (n === 0) return "Сегодня";
+      if (n === 1) return "Завтра";
+      if (n > 1) return "Через " + n + " " + plural(n, ["день", "дня", "дней"]);
+      return Math.abs(n) + " " + plural(n, ["день", "дня", "дней"]) + " назад";
+    }
+
+    function diffYMD(a, b) {
+      let y = b.getFullYear() - a.getFullYear();
+      let m = b.getMonth() - a.getMonth();
+      let d = b.getDate() - a.getDate();
+      if (d < 0) { m--; d += new Date(b.getFullYear(), b.getMonth(), 0).getDate(); }
+      if (m < 0) { y--; m += 12; }
+      return { y, m, d };
+    }
+
+    const fromLabel = v => "От " + (isHer(v) ? HER : "Исы");
+
+    // =====================================================================
+    //   ОКНА: ФОРМА И ЧТЕНИЕ
+    // =====================================================================
+    function openForm(opts) {
+      const values = Object.assign({}, opts.values || {});
+      const inputs = {};
+      const body = h("div", {});
+      body.append(h("h3", {}, opts.title));
+
+      opts.fields.forEach(f => {
+        body.append(h("label", {}, f.label));
+        if (f.type === "level") {
+          if (!values[f.key]) values[f.key] = "red";
+          const wrap = h("div", { class: "levels" });
+          Object.keys(LEVELS).forEach(k => {
+            const b = h("button", { type: "button", class: "level " + k },
+              h("div", { class: "dot " + k, style: "margin:0 auto 8px" }),
+              LEVELS[k].name,
+              h("div", { style: "font-size:11px;color:var(--hint);margin-top:3px" }, LEVELS[k].hint));
+            b.onclick = () => {
+              values[f.key] = k;
+              wrap.querySelectorAll(".level").forEach(x => x.classList.remove("sel"));
+              b.classList.add("sel");
+              haptic();
+            };
+            if (values[f.key] === k) b.classList.add("sel");
+            wrap.append(b);
+          });
+          body.append(wrap);
+        } else if (f.type === "select") {
+          const s = h("select", {}, f.options.map(o => h("option", { value: o[0] }, o[1])));
+          s.value = values[f.key] || f.options[0][0];
+          inputs[f.key] = s;
+          body.append(s);
+        } else if (f.type === "textarea") {
+          const t = h("textarea", { placeholder: f.placeholder || "" });
+          t.value = values[f.key] || "";
+          inputs[f.key] = t;
+          body.append(t);
+        } else {
+          const i = h("input", { type: f.type || "text", placeholder: f.placeholder || "" });
+          i.value = values[f.key] || "";
+          inputs[f.key] = i;
+          body.append(i);
+        }
+      });
+
+      const overlay = h("div", { class: "overlay" }, h("div", { class: "sheet" }, body));
+      const close = () => overlay.remove();
+      overlay.onclick = e => { if (e.target === overlay) close(); };
+
+      const actions = h("div", { class: "actions" });
+      actions.append(h("button", { class: "btn ghost", onclick: close }, "Отмена"));
+      actions.append(h("button", { class: "btn", onclick: () => {
+        const out = Object.assign({}, values);
+        for (const k in inputs) out[k] = inputs[k].value.trim();
+        const missing = opts.fields.find(f => f.required && !out[f.key]);
+        if (missing) { inputs[missing.key].focus(); haptic(); return; }
+        opts.onSave(out);
+        haptic("medium");
+        close();
+        render();
+      } }, "Сохранить"));
+      body.append(actions);
+
+      if (opts.onDelete) {
+        let armed = false;
+        const del = h("button", { class: "btn danger wide", style: "margin-top:12px" }, "Удалить");
+        del.onclick = () => {
+          if (!armed) { armed = true; del.textContent = "Нажми ещё раз, чтобы удалить"; return; }
+          opts.onDelete();
+          close();
+          if (opts.afterDelete) opts.afterDelete();
+          render();
+        };
+        body.append(del);
+      }
+
+      document.body.append(overlay);
+    }
+
+    function openReader(title, sub, text, onDelete) {
+      const body = h("div", {},
+        h("h3", {}, title),
+        sub ? h("div", { class: "sub", style: "margin:4px 0 14px" }, sub) : null,
+        h("div", { style: "white-space:pre-wrap;line-height:1.65;font-size:17px;word-break:break-word" }, text));
+      const overlay = h("div", { class: "overlay" }, h("div", { class: "sheet" }, body));
+      const close = () => overlay.remove();
+      overlay.onclick = e => { if (e.target === overlay) close(); };
+      body.append(h("div", { class: "actions" }, h("button", { class: "btn", onclick: close }, "Закрыть")));
+      if (onDelete) {
+        let armed = false;
+        const del = h("button", { class: "btn danger wide", style: "margin-top:12px" }, "Удалить");
+        del.onclick = () => {
+          if (!armed) { armed = true; del.textContent = "Нажми ещё раз, чтобы удалить"; return; }
+          onDelete(); close(); render();
+        };
+        body.append(del);
+      }
+      document.body.append(overlay);
+    }
+
+    // =====================================================================
+    //   ФОН
+    // =====================================================================
+    let bgUrl = null;
+    let lastBgKey = null;
+    let role = SYNC_ON ? (function () { try { return localStorage.getItem("role_v1") || ""; } catch (e) { return ""; } })() : "isa";
+
+    // Менять фон может только Иса (на сервере это тоже проверяется)
+    function canEditBg() { return !REMOTE || role === "isa"; }
+
+    async function applyBackground() {
+      const el = document.getElementById("bg");
+      const b = state.settings && state.settings.bg;
+      lastBgKey = stable(b || null);
+      if (bgUrl) { URL.revokeObjectURL(bgUrl); bgUrl = null; }
+      let top = BG_PRESETS[0].top;
+      let usePreset = true;
+      if (b && b.type === "photo" && b.id) {
+        try {
+          const u = await photoApi.url(b.id, "full");
+          if (lastBgKey !== stable((state.settings && state.settings.bg) || null)) { URL.revokeObjectURL(u); return; }
+          bgUrl = u;
+          el.style.background = "";
+          el.style.backgroundImage = 'url("' + u + '")';
+          el.classList.add("has-photo");
+          top = "#0e1013";
+          usePreset = false;
+        } catch (e) { /* не удалось загрузить: покажем обычный фон */ }
+      }
+      if (usePreset) {
+        const p = BG_PRESETS.find(x => b && x.id === b.id) || BG_PRESETS[0];
+        el.classList.remove("has-photo");
+        el.style.backgroundImage = "";
+        el.style.background = p.css;
+        top = p.top;
+      }
+      try { tg.setHeaderColor(top); tg.setBackgroundColor(top); } catch (e) {}
+      document.documentElement.style.background = top;
+    }
+
+    function setBg(v) {
+      state.settings.bg = v;
+      save();
+      applyBackground();
+    }
+
+    function openBgSheet() {
+      const cur = state.settings.bg;
+      const body = h("div", {});
+      body.append(h("h3", {}, "Оформление"));
+      body.append(h("div", { class: "sub", style: "margin:4px 0 14px" },
+        REMOTE ? "Фон увидят и у тебя, и у " + HER + ". Менять его можешь только ты." : "Фон на этом устройстве."));
+
+      const overlay = h("div", { class: "overlay" }, h("div", { class: "sheet" }, body));
+      const close = () => overlay.remove();
+      const reopen = () => { close(); openBgSheet(); };
+      overlay.onclick = e => { if (e.target === overlay) close(); };
+
+      body.append(h("label", {}, "Цвет"));
+      const sw = h("div", { class: "swatches" });
+      BG_PRESETS.forEach(p => {
+        const selected = (!cur && p.id === BG_PRESETS[0].id) || (cur && cur.type === "preset" && cur.id === p.id);
+        sw.append(h("button", { class: "swatch" + (selected ? " sel" : ""), style: "background:" + p.css, onclick: () => {
+          const old = state.settings.bg;
+          setBg({ type: "preset", id: p.id });
+          if (old && old.type === "photo") photoApi.remove(old.id).catch(() => {});
+          haptic(); reopen();
+        } }, p.name));
+      });
+      body.append(sw);
+
+      body.append(h("label", {}, "Своё фото"));
+      const file = h("input", { type: "file", accept: "image/*", style: "display:none" });
+      file.onchange = async () => {
+        const f = file.files && file.files[0];
+        file.value = "";
+        if (!f) return;
+        const t = toast("Загружаю фон…");
+        try {
+          const old = state.settings.bg;
+          const id = await photoApi.add("bg", f, { max: 1600, quality: 0.8 });
+          setBg({ type: "photo", id: id });
+          if (old && old.type === "photo") photoApi.remove(old.id).catch(() => {});
+          haptic("medium");
+        } catch (e) { toast("Не удалось загрузить фото", 2500); }
+        t.remove();
+        reopen();
+      };
+      body.append(h("button", { class: "btn ghost wide", onclick: () => file.click() },
+        cur && cur.type === "photo" ? "Выбрать другое фото из галереи" : "Выбрать фото из галереи"), file);
+
+      if (cur && (cur.type === "photo" || cur.id !== BG_PRESETS[0].id)) {
+        body.append(h("button", { class: "linkbtn", style: "margin-top:8px", onclick: () => {
+          const old = state.settings.bg;
+          setBg({ type: "preset", id: BG_PRESETS[0].id });
+          if (old && old.type === "photo") photoApi.remove(old.id).catch(() => {});
+          reopen();
+        } }, "Сбросить фон"));
+      }
+      body.append(h("div", { class: "actions" }, h("button", { class: "btn", onclick: close }, "Готово")));
+      document.body.append(overlay);
+    }
 
     // =====================================================================
     //   СИНХРОНИЗАЦИЯ С СЕРВЕРОМ
     // =====================================================================
-    const SNAP_KEY = "sync_snap_v1", SINCE_KEY = "sync_since_v1", INIT_KEY = "sync_init_v1";
     let lastKnownIds = null;
     let lastSyncError = "";
+    let syncState = "busy";
 
     // Одинаковая строка для одинаковых данных (порядок ключей не важен)
     function stable(v) {
@@ -462,24 +782,37 @@
       ["our", "isa", "makosh"].forEach(k => (state.prefs[k] || []).forEach(o => put("prefs_" + k, o)));
       state.reasons.forEach(o => put("reasons", o));
       state.coupons.forEach(o => put("coupons", o));
-      state.songs.forEach(o => put("songs", o));
       state.letters.forEach(o => put("letters", o));
       state.wishes.forEach(o => put("wishes", o));
       Object.keys(state.couponUsed).forEach(cid => {
         f["couponUsed:cu_" + cid] = { col: "couponUsed", id: "cu_" + cid, data: { cid: cid, on: state.couponUsed[cid] } };
       });
+      if (state.settings && state.settings.bg) {
+        f["settings:bg"] = { col: "settings", id: "bg", data: state.settings.bg };
+      }
       return f;
     }
 
     function listFor(col) {
       if (col.indexOf("prefs_") === 0) return state.prefs[col.slice(6)] || null;
       return { dates: state.dates, trips: state.trips, reasons: state.reasons, coupons: state.coupons,
-               songs: state.songs, letters: state.letters, wishes: state.wishes }[col] || null;
+               letters: state.letters, wishes: state.wishes }[col] || null;
+    }
+
+    // Обновляем объект «на месте», чтобы открытые окна не потеряли ссылку на запись
+    function assignInPlace(target, src) {
+      Object.keys(target).forEach(k => delete target[k]);
+      Object.assign(target, src);
     }
 
     // Применяем запись, пришедшую с сервера
     function applyRemote(it) {
       const d = it.data || {};
+      if (it.col === "settings") {
+        if (it.id !== "bg") return;
+        state.settings.bg = it.deleted ? null : d;
+        return;
+      }
       if (it.col === "couponUsed") {
         if (it.deleted) delete state.couponUsed[d.cid]; else state.couponUsed[d.cid] = d.on;
         return;
@@ -489,7 +822,7 @@
         if (!trip) return;
         const i = trip.memories.findIndex(m => m.id === it.id);
         if (it.deleted) { if (i >= 0) trip.memories.splice(i, 1); }
-        else if (i >= 0) trip.memories[i] = { id: it.id, text: d.text };
+        else if (i >= 0) trip.memories[i].text = d.text;
         else trip.memories.push({ id: it.id, text: d.text });
         return;
       }
@@ -500,13 +833,13 @@
       const obj = Object.assign({}, d);
       if (it.col === "trips") obj.memories = i >= 0 ? list[i].memories : [];
       if (it.col === "trips" || it.col === "wishes") obj.photoCount = (i >= 0 && list[i].photoCount) || 0;
-      if (i >= 0) list[i] = obj; else list.push(obj);
+      if (i >= 0) assignInPlace(list[i], obj); else list.push(obj);
     }
 
     function labelFor(rec) {
       const d = rec.data || {};
       switch (rec.col) {
-        case "dates": case "trips": case "coupons": case "songs": return d.title || "";
+        case "dates": case "trips": case "coupons": return d.title || "";
         case "wishes": return d.text || "";
         case "memories": { const t = state.trips.find(x => x.id === d.tripId); return t ? t.title : ""; }
         case "couponUsed": { const c = COUPONS.concat(state.coupons).find(x => x.id === d.cid); return c ? c.title : ""; }
@@ -551,6 +884,7 @@
     function afterRemoteChange() {
       const cur = stack[stack.length - 1];
       if (cur.name !== "gifts") render();
+      if (stable(state.settings.bg || null) !== lastBgKey) applyBackground();
     }
 
     async function pushDiff(silent) {
@@ -619,10 +953,13 @@
       syncing = true;
       setSyncUI("busy");
       try {
-        if (!localStorage.getItem(INIT_KEY)) await initialSync();
+        if (!localStorage.getItem(INIT_KEY)) { await initialSync(); refreshPhotoCounts(true); }
         else { await pull(false); await pushDiff(false); }
         lastSyncError = "";
         setSyncUI("ok");
+        const pn = stack[stack.length - 1].name;
+        if (pn === "home" || pn === "trips" || pn === "wishes") refreshPhotoCounts();
+        if (role === "isa" && partnerLinked !== true) fetchRole();
       } catch (e) {
         const code = String(e && e.message || "");
         lastSyncError = code;
@@ -633,34 +970,89 @@
       }
     }
 
+    const SYNC_LABELS = {
+      ok: ["#4fa774", "синхронизировано"], busy: ["#d9a23a", "синхронизация…"],
+      err: ["#d4574f", "нет связи"], denied: ["#d4574f", "нет доступа"]
+    };
     function setSyncUI(kind) {
+      const was = syncState;
+      syncState = kind;
+      updateSyncEl();
+      // Если выяснилось, что доступа нет, перерисуем главную, чтобы показать подсказку
+      if (kind === "denied" && was !== "denied" && stack[stack.length - 1].name === "home") render();
+    }
+    function updateSyncEl() {
       const el = document.getElementById("syncdot");
       if (!el) return;
-      const map = {
-        ok: ["#5fd68a", "синхронизировано"], busy: ["#ffc94d", "синхронизация…"],
-        err: ["#ff5c6c", "нет связи"], denied: ["#ff5c6c", "нет доступа"]
-      };
-      const m = map[kind];
+      const m = SYNC_LABELS[syncState];
       el.innerHTML = "";
       el.append(h("span", { class: "sd", style: "background:" + m[0] }), m[1]);
-      el.dataset.kind = kind;
+    }
+    function onSyncClick() {
+      if (syncState === "denied") toast("Нет доступа. Открой дневник по ссылке-приглашению от Исы", 4000);
+      else if (syncState === "err") toast("Нет связи с сервером" + (lastSyncError ? " (" + lastSyncError + ")" : ""), 3000);
+      else toast("Всё синхронизировано", 1500);
+      syncNow();
+    }
+
+    // Кто я (Иса или второй человек) и подключена ли она. Для Исы сервер ещё даёт ссылку-приглашение
+    let partnerLinked = null, inviteLink = "";
+    async function fetchRole() {
+      try {
+        const r = await (await apiFetch("/api/me")).json();
+        let changed = false;
+        if (r.key && r.key !== role) {
+          role = r.key;
+          try { localStorage.setItem("role_v1", role); } catch (e) {}
+          changed = true;
+        }
+        const linked = !!r.linked, link = r.invite || "";
+        if (linked !== partnerLinked || link !== inviteLink) { partnerLinked = linked; inviteLink = link; changed = true; }
+        if (changed && stack[stack.length - 1].name === "home") render();
+      } catch (e) {}
+    }
+
+    function shareInvite() {
+      const u = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=" + encodeURIComponent("Это для тебя");
+      try { tg.openTelegramLink(u); } catch (e) { openLink(u); }
+    }
+    function copyInvite() {
+      const ok = () => toast("Ссылка скопирована", 1600);
+      const fail = () => toast("Не удалось скопировать, нажми «Отправить ей»", 2600);
+      try { navigator.clipboard.writeText(inviteLink).then(ok, fail); } catch (e) { fail(); }
+    }
+
+    // Количество фото в карточках обновляем отдельным лёгким запросом
+    let lastCountFetch = 0;
+    async function refreshPhotoCounts(force) {
+      if (!REMOTE) return;
+      if (!force && Date.now() - lastCountFetch < 20000) return;
+      lastCountFetch = Date.now();
+      try {
+        const r = await (await apiFetch("/api/photocounts")).json();
+        const counts = r.counts || {};
+        let changed = false;
+        state.trips.concat(state.wishes).forEach(o => {
+          const c = counts[o.id] || 0;
+          if ((o.photoCount || 0) !== c) { o.photoCount = c; changed = true; }
+        });
+        if (changed) {
+          persist();
+          const n = stack[stack.length - 1].name;
+          if (n === "home" || n === "trips" || n === "wishes") render();
+        }
+      } catch (e) {}
     }
 
     function startSync() {
-      const el = document.getElementById("syncdot");
-      if (el) el.onclick = () => {
-        const k = el.dataset.kind;
-        if (k === "denied") toast("Нет доступа: проверь Telegram ID в настройках сервера или открой приложение заново", 4000);
-        else if (k === "err") toast("Нет связи с сервером" + (lastSyncError ? " (" + lastSyncError + ")" : ""), 3000);
-        else toast("Всё синхронизировано ✨", 1500);
-        syncNow();
-      };
+      if (!SYNC_ON) return;
+      fetchRole();
       syncNow();
       setInterval(() => { if (!document.hidden) syncNow(); }, 12000);
       document.addEventListener("visibilitychange", () => { if (!document.hidden) syncNow(); });
     }
 
-    // Работа с фото: на сервере (если подключён) или на устройстве
+    // Фото: на сервере (если подключён) или на устройстве
     const photoApi = {
       async list(ownerId) {
         if (REMOTE) { const r = await apiFetch("/api/photos?owner=" + encodeURIComponent(ownerId)); return (await r.json()).photos || []; }
@@ -682,21 +1074,26 @@
         }
         return URL.createObjectURL(await resp.blob());
       },
-      async add(ownerId, file) {
+      // возвращает id добавленного фото
+      async add(ownerId, file, opts) {
+        opts = opts || {};
+        const id = uid();
         if (!REMOTE) {
-          const blob = await resizeImage(file, 1280);
-          await putPhoto({ id: uid(), tripId: ownerId, blob: blob, ts: Date.now() });
-          return;
+          const blob = await resizeImage(file, opts.max || 1280, opts.quality || 0.82);
+          await putPhoto({ id: id, tripId: ownerId, blob: blob, ts: Date.now() });
+          return id;
         }
-        const full = await resizeImage(file, 1280, 0.82);
+        const full = await resizeImage(file, opts.max || 1280, opts.quality || 0.82);
         const thumb = await resizeImage(file, 360, 0.75);
-        await uploadPhoto(ownerId, uid(), full, thumb, Date.now());
+        await uploadPhoto(ownerId, id, full, thumb, Date.now());
+        return id;
       },
       async remove(id) {
         if (REMOTE) await apiFetch("/api/photo/" + encodeURIComponent(id), { method: "DELETE" });
         else await delPhoto(id);
       },
       notify(count, label) {
+        if (!REMOTE) return;
         apiFetch("/api/notify", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ kind: "photos", count: count, label: label })
@@ -705,260 +1102,13 @@
     };
 
     // =====================================================================
-    //   ФОТО (IndexedDB)
-    // =====================================================================
-    let dbPromise;
-    function db() {
-      if (!dbPromise) {
-        dbPromise = new Promise((resolve, reject) => {
-          const r = indexedDB.open("isa_makosh_photos", 1);
-          r.onupgradeneeded = () => {
-            const s = r.result.createObjectStore("photos", { keyPath: "id" });
-            s.createIndex("tripId", "tripId");
-          };
-          r.onsuccess = () => resolve(r.result);
-          r.onerror = () => reject(r.error);
-        });
-      }
-      return dbPromise;
-    }
-    function tx(mode, fn) {
-      return db().then(d => new Promise((resolve, reject) => {
-        const t = d.transaction("photos", mode);
-        const req = fn(t.objectStore("photos"));
-        t.oncomplete = () => resolve(req ? req.result : undefined);
-        t.onerror = () => reject(t.error);
-      }));
-    }
-    const putPhoto = rec => tx("readwrite", s => s.put(rec));
-    const getPhotos = ownerId => tx("readonly", s => s.index("tripId").getAll(ownerId));
-    const delPhoto = id => tx("readwrite", s => s.delete(id));
-
-    async function deleteOwnerPhotos(ownerId) {
-      try { const list = await getPhotos(ownerId); for (const p of list) await delPhoto(p.id); } catch (e) {}
-    }
-
-    function resizeImage(file, max) {
-      return new Promise((resolve, reject) => {
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.onload = () => {
-          const k = Math.min(1, max / Math.max(img.width, img.height));
-          const c = document.createElement("canvas");
-          c.width = Math.round(img.width * k);
-          c.height = Math.round(img.height * k);
-          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          c.toBlob(b => { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("blob")); }, "image/jpeg", 0.82);
-        };
-        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img")); };
-        img.src = url;
-      });
-    }
-
-    // =====================================================================
-    //   ПОМОЩНИКИ
-    // =====================================================================
-    function h(tag, attrs, ...children) {
-      const e = document.createElement(tag);
-      for (const k in (attrs || {})) {
-        if (k === "class") e.className = attrs[k];
-        else if (k.startsWith("on")) e[k] = attrs[k];
-        else e.setAttribute(k, attrs[k]);
-      }
-      children.flat().forEach(c => {
-        if (c == null || c === false) return;
-        e.append(c.nodeType ? c : document.createTextNode(c));
-      });
-      return e;
-    }
-
-    function haptic(type) { try { tg.HapticFeedback.impactOccurred(type || "light"); } catch (e) {} }
-    function openLink(url) { try { tg.openLink(url); } catch (e) { window.open(url, "_blank"); } }
-
-    function toast(text, ms) {
-      const t = h("div", { class: "toast" }, text);
-      document.body.append(t);
-      if (ms) setTimeout(() => t.remove(), ms);
-      return t;
-    }
-
-    function pad(n) { return String(n).padStart(2, "0"); }
-    function todayISO() { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
-    function parseISO(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
-    function todayMid() { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }
-
-    function formatDate(iso) {
-      if (!iso) return "";
-      const [y, m, d] = iso.split("-");
-      return d + "." + m + "." + y;
-    }
-
-    function plural(n, forms) {
-      const a = Math.abs(n) % 100, b = a % 10;
-      if (a > 10 && a < 20) return forms[2];
-      if (b > 1 && b < 5) return forms[1];
-      if (b === 1) return forms[0];
-      return forms[2];
-    }
-
-    function daysUntil(item) {
-      if (!item.date) return null;
-      const [y, m, d] = item.date.split("-").map(Number);
-      const today = todayMid();
-      let target = new Date(y, m - 1, d);
-      if (item.repeat === "yearly") {
-        target = new Date(today.getFullYear(), m - 1, d);
-        if (target < today) target = new Date(today.getFullYear() + 1, m - 1, d);
-      }
-      return Math.round((target - today) / 86400000);
-    }
-
-    function daysLabel(n) {
-      if (n === null) return "";
-      if (n === 0) return "Сегодня! 🎉";
-      if (n === 1) return "Завтра";
-      if (n > 1) return "Через " + n + " " + plural(n, ["день", "дня", "дней"]);
-      return "Прошло " + Math.abs(n) + " " + plural(n, ["день", "дня", "дней"]) + " назад";
-    }
-
-    function diffYMD(a, b) {
-      let y = b.getFullYear() - a.getFullYear();
-      let m = b.getMonth() - a.getMonth();
-      let d = b.getDate() - a.getDate();
-      if (d < 0) { m--; d += new Date(b.getFullYear(), b.getMonth(), 0).getDate(); }
-      if (m < 0) { y--; m += 12; }
-      return { y, m, d };
-    }
-
-    function celebrate(count) {
-      const em = ["💖", "✨", "💗", "🎉", "💫", "🌸"];
-      for (let i = 0; i < (count || 18); i++) {
-        const s = h("span", { class: "burst", style: "left:" + (8 + Math.random() * 84) + "%;animation-delay:" + (Math.random() * 0.35) + "s;font-size:" + (18 + Math.random() * 20) + "px" }, em[i % em.length]);
-        document.body.append(s);
-        setTimeout(() => s.remove(), 2400);
-      }
-    }
-
-    function floaters() {
-      const wrap = h("div", { class: "floaters" });
-      for (let i = 0; i < 14; i++) {
-        wrap.append(h("span", {
-          style: "left:" + (Math.random() * 100) + "%;font-size:" + (10 + Math.random() * 16) + "px;animation-duration:" + (16 + Math.random() * 18) + "s;animation-delay:" + (-Math.random() * 24) + "s"
-        }, i % 3 === 0 ? "✦" : "♥"));
-      }
-      document.body.prepend(wrap);
-    }
-
-    // =====================================================================
-    //   ОКНА: ФОРМА И ЧТЕНИЕ
-    // =====================================================================
-    function openForm(opts) {
-      const values = Object.assign({}, opts.values || {});
-      const inputs = {};
-      const body = h("div", {});
-      body.append(h("h3", {}, opts.title));
-
-      opts.fields.forEach(f => {
-        body.append(h("label", {}, f.label));
-        if (f.type === "level") {
-          if (!values[f.key]) values[f.key] = "red";
-          const wrap = h("div", { class: "levels" });
-          Object.keys(LEVELS).forEach(k => {
-            const b = h("button", { type: "button", class: "level " + k },
-              h("div", { class: "dot " + k, style: "margin:0 auto 8px" }),
-              LEVELS[k].name,
-              h("div", { style: "font-size:11px;color:var(--hint);margin-top:3px;font-weight:500" }, LEVELS[k].hint));
-            b.onclick = () => {
-              values[f.key] = k;
-              wrap.querySelectorAll(".level").forEach(x => x.classList.remove("sel"));
-              b.classList.add("sel");
-              haptic();
-            };
-            if (values[f.key] === k) b.classList.add("sel");
-            wrap.append(b);
-          });
-          body.append(wrap);
-        } else if (f.type === "select") {
-          const s = h("select", {}, f.options.map(o => h("option", { value: o[0] }, o[1])));
-          s.value = values[f.key] || f.options[0][0];
-          inputs[f.key] = s;
-          body.append(s);
-        } else if (f.type === "textarea") {
-          const t = h("textarea", { placeholder: f.placeholder || "" });
-          t.value = values[f.key] || "";
-          inputs[f.key] = t;
-          body.append(t);
-        } else {
-          const i = h("input", { type: f.type || "text", placeholder: f.placeholder || "" });
-          i.value = values[f.key] || "";
-          inputs[f.key] = i;
-          body.append(i);
-        }
-      });
-
-      const overlay = h("div", { class: "overlay" }, h("div", { class: "sheet" }, body));
-      const close = () => overlay.remove();
-      overlay.onclick = e => { if (e.target === overlay) close(); };
-
-      const actions = h("div", { class: "actions" });
-      actions.append(h("button", { class: "btn ghost", onclick: close }, "Отмена"));
-      actions.append(h("button", { class: "btn", onclick: () => {
-        const out = Object.assign({}, values);
-        for (const k in inputs) out[k] = inputs[k].value.trim();
-        const missing = opts.fields.find(f => f.required && !out[f.key]);
-        if (missing) { inputs[missing.key].focus(); haptic(); return; }
-        opts.onSave(out);
-        haptic("medium");
-        close();
-        render();
-      } }, "Сохранить"));
-      body.append(actions);
-
-      if (opts.onDelete) {
-        let armed = false;
-        const del = h("button", { class: "btn danger", style: "width:100%;margin-top:12px" }, "Удалить");
-        del.onclick = () => {
-          if (!armed) { armed = true; del.textContent = "Нажми ещё раз, чтобы удалить"; return; }
-          opts.onDelete();
-          close();
-          if (opts.afterDelete) opts.afterDelete();
-          render();
-        };
-        body.append(del);
-      }
-
-      document.body.append(overlay);
-    }
-
-    function openReader(title, sub, text, onDelete) {
-      const body = h("div", {},
-        h("h3", {}, title),
-        sub ? h("div", { class: "sub", style: "margin:4px 0 14px" }, sub) : null,
-        h("div", { style: "white-space:pre-wrap;line-height:1.65;font-size:16px;word-break:break-word" }, text));
-      const overlay = h("div", { class: "overlay" }, h("div", { class: "sheet" }, body));
-      const close = () => overlay.remove();
-      overlay.onclick = e => { if (e.target === overlay) close(); };
-      body.append(h("div", { class: "actions" }, h("button", { class: "btn", onclick: close }, "Закрыть")));
-      if (onDelete) {
-        let armed = false;
-        const del = h("button", { class: "btn danger", style: "width:100%;margin-top:12px" }, "Удалить");
-        del.onclick = () => {
-          if (!armed) { armed = true; del.textContent = "Нажми ещё раз, чтобы удалить"; return; }
-          onDelete(); close(); render();
-        };
-        body.append(del);
-      }
-      document.body.append(overlay);
-    }
-
-    // =====================================================================
     //   НАВИГАЦИЯ
     // =====================================================================
     let stack = [{ name: "home" }];
     let photoUrls = [];
     let giftsUnlocked = false;
 
-    function go(name, param) { stack.push({ name, param }); render(); window.scrollTo(0, 0); }
+    function go(name, param) { lastCountFetch = 0; stack.push({ name, param }); render(); window.scrollTo(0, 0); }
     function back() { if (stack.length > 1) { stack.pop(); render(); window.scrollTo(0, 0); } }
     tg.BackButton.onClick(back);
 
@@ -972,32 +1122,38 @@
       if (cur.name !== "gifts") giftsUnlocked = false;
 
       if (stack.length > 1) tg.BackButton.show(); else tg.BackButton.hide();
+      // Вне Telegram своей кнопки «назад» нет, поэтому рисуем её сами
+      if (stack.length > 1 && !tg.initData) {
+        app.append(h("button", { class: "backlink", onclick: back }, ic("back"), "Назад"));
+        app.lastChild.firstChild.style.cssText = "width:16px;height:16px";
+      }
 
       const pages = {
         home: renderHome, dates: renderDates, trips: renderTrips, trip: renderTrip, prefs: renderPrefs,
         reasons: renderReasons, coupons: renderCoupons, letters: renderLetters,
-        wishes: renderWishes, wish: renderWish, gifts: renderGifts, playlist: renderPlaylist
+        wishes: renderWishes, wish: renderWish, gifts: renderGifts
       };
       (pages[cur.name] || renderHome)(app, cur.param);
+      if (cur.name === "home" || cur.name === "trips" || cur.name === "wishes") refreshPhotoCounts();
     }
 
     function addFab(text, onclick) { document.body.append(h("button", { class: "fab", onclick }, text)); }
-    function delay(i) { return "animation-delay:" + (i * 0.06) + "s"; }
+    function delay(i) { return "animation-delay:" + (i * 0.04) + "s"; }
 
     // =====================================================================
     //   ПРИВЕТСТВИЕ
     // =====================================================================
     function showWelcome() {
       const w = h("div", { class: "welcome" },
-        h("div", { class: "heart" }, "💖"),
+        h("div", { class: "w-label" }, HIM + " · " + HER),
         h("h1", {}, WELCOME_TITLE),
         h("p", {}, WELCOME_TEXT),
         h("button", { class: "btn", onclick: () => {
           try { localStorage.setItem("welcomed_v1", "1"); } catch (e) {}
-          haptic("medium"); celebrate(20);
-          w.style.transition = "opacity .5s"; w.style.opacity = "0";
-          setTimeout(() => w.remove(), 500);
-        } }, "Войти в наш дневник"));
+          haptic("medium");
+          w.style.transition = "opacity .4s"; w.style.opacity = "0";
+          setTimeout(() => w.remove(), 400);
+        } }, "Войти"));
       document.body.append(w);
     }
 
@@ -1018,10 +1174,9 @@
 
       app.append(h("div", { class: "together" },
         h("div", { class: "lbl" }, "Мы вместе"),
-        h("div", { class: "num" }, String(total)),
-        h("div", { class: "days" }, plural(total, ["день", "дня", "дней"]), " ", h("span", { class: "beat" }, "❤️")),
+        h("div", { class: "bignum" }, h("span", { class: "num" }, String(total)), h("span", { class: "unit" }, plural(total, ["день", "дня", "дней"]))),
         parts.length ? h("div", { class: "ymd" }, parts.join(" · ")) : null,
-        h("div", { class: "next" }, n === 0 ? "Сегодня наша годовщина! 🎉" : "До годовщины: " + n + " " + plural(n, ["день", "дня", "дней"]))));
+        h("div", { class: "next" }, n === 0 ? "Сегодня наша годовщина" : "До годовщины: " + n + " " + plural(n, ["день", "дня", "дней"]))));
     }
 
     function homeCard(key, meta, i) {
@@ -1031,15 +1186,39 @@
         if (key === "our" || key === "isa" || key === "makosh") go("prefs", key);
         else go(key);
       } },
-        h("div", { class: "tile", style: "background:" + s.grad }, s.emoji),
+        iconBox(s.icon),
         h("div", { class: "body" }, h("div", { class: "name" }, s.title), h("div", { class: "meta" }, meta)),
-        h("div", { class: "arrow" }, "›"));
+        arrow());
     }
 
     function renderHome(app) {
-      const orn = h("div", { class: "orn", onclick: () => showWelcome() }, "✦ ✦ ✦");
-      app.append(h("div", { class: "hero" }, orn,
-        h("h1", {}, "Это приложение создано для нашего удобства и заботы друг о друге ❤️")));
+      const actions = h("div", { class: "topactions" });
+      if (SYNC_ON) { actions.append(h("button", { id: "syncdot", class: "sync", onclick: onSyncClick })); }
+      if (canEditBg()) actions.append(h("button", { class: "iconbtn", "aria-label": "Оформление", onclick: () => { haptic(); openBgSheet(); } }, ic("sliders")));
+      app.append(h("div", { class: "topbar" },
+        h("div", { class: "brand", onclick: () => showWelcome() }, HIM + " · " + HER), actions));
+      updateSyncEl();
+
+      app.append(h("h1", { class: "lead" }, "Это приложение создано для нашего удобства и заботы друг о друге ❤️"));
+
+      // Иса: пока второй человек не подключён, показываем приглашение
+      if (SYNC_ON && role === "isa" && partnerLinked === false) {
+        app.append(h("div", { class: "invite" },
+          h("div", { class: "lbl" }, "Подключение"),
+          h("div", { class: "name" }, HER + " ещё не подключена"),
+          h("div", { class: "note", style: "margin:0 0 14px" }, inviteLink
+            ? "Отправь ей эту ссылку. Ей нужно только нажать на неё и на кнопку Start: без регистрации и без поиска ID."
+            : "Ссылка пока недоступна. Отправь боту команду /invite."),
+          inviteLink ? h("div", { class: "row", style: "margin:0" },
+            h("button", { class: "btn", onclick: shareInvite }, "Отправить ей"),
+            h("button", { class: "btn ghost", onclick: copyInvite }, "Скопировать")) : null));
+      }
+      // Тот, кто открыл без приглашения
+      if (SYNC_ON && syncState === "denied") {
+        app.append(h("div", { class: "invite" },
+          h("div", { class: "lbl" }, "Нет доступа"),
+          h("div", { class: "note", style: "margin:6px 0 0" }, "Открой дневник по ссылке-приглашению от Исы: нажми на неё и на кнопку Start.")));
+      }
 
       renderTogether(app);
 
@@ -1054,14 +1233,13 @@
       app.append(homeCard("our", "Записей: " + state.prefs.our.length, i++));
       app.append(homeCard("isa", "Записей: " + state.prefs.isa.length, i++));
       app.append(homeCard("makosh", "Записей: " + state.prefs.makosh.length, i++));
+      app.append(homeCard("wishes", "Сделано: " + doneWishes + " из " + state.wishes.length, i++));
+      app.append(homeCard("gifts", "Закрыто PIN-кодом", i++));
 
       app.append(h("div", { class: "section-title" }, "Маленькие сюрпризы"));
       app.append(homeCard("reasons", "Причин: " + (REASONS.length + state.reasons.length), i++));
       app.append(homeCard("coupons", "Использовано: " + usedCoupons + " из " + totalCoupons, i++));
       app.append(homeCard("letters", "Писем: " + state.letters.length, i++));
-      app.append(homeCard("wishes", "Сделано: " + doneWishes + " из " + state.wishes.length, i++));
-      app.append(homeCard("gifts", "Закрыто PIN-кодом 🔒", i++));
-      app.append(homeCard("playlist", "Песен: " + (SONGS.length + state.songs.length), i++));
     }
 
     // =====================================================================
@@ -1075,11 +1253,11 @@
     ];
 
     function renderDates(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.dates.emoji + " Важные даты"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.dates.title));
       app.append(h("div", { class: "sub" }, "Ближайшие даты показаны первыми"));
 
       if (!state.dates.length) {
-        app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "💌"), "Пока пусто.", h("br"), "Добавь первую дату кнопкой ниже."));
+        app.append(h("div", { class: "empty" }, "Пока пусто.", h("br"), "Добавь первую дату кнопкой ниже."));
       }
 
       const sorted = state.dates.slice().sort((a, b) => {
@@ -1098,10 +1276,10 @@
             h("div", { class: "meta" }, formatDate(item.date) + (item.repeat === "yearly" ? " · каждый год" : "")),
             n !== null ? h("span", { class: "badge" }, daysLabel(n)) : null,
             item.note ? h("div", { class: "note" }, item.note) : null),
-          h("div", { class: "arrow" }, "✎")));
+          h("div", { class: "arrow" }, ic("pencil"))));
       });
 
-      addFab("+ Добавить дату", () => {
+      addFab("Добавить дату", () => {
         openForm({
           title: "Новая дата", fields: DATE_FIELDS,
           onSave: v => { state.dates.push({ id: uid(), title: v.title, date: v.date, repeat: v.repeat, note: v.note }); save(); }
@@ -1120,7 +1298,7 @@
     // =====================================================================
     //   ФОТО-БЛОК (для поездок и желаний)
     // =====================================================================
-    function photoBlock(owner, app) {
+    function photoBlock(owner, app, title) {
       app.append(h("div", { class: "section-title" }, "Фотографии"));
 
       const fileInput = h("input", { type: "file", accept: "image/*", multiple: "multiple", style: "display:none" });
@@ -1133,28 +1311,24 @@
         const t = toast("Загружаю фото…");
         let added = 0;
         for (const f of files) {
-          try {
-            const blob = await resizeImage(f, 1280);
-            await putPhoto({ id: uid(), tripId: owner.id, blob: blob, ts: Date.now() });
-            owner.photoCount = (owner.photoCount || 0) + 1; added++;
-          } catch (e) {}
+          try { await photoApi.add(owner.id, f); added++; } catch (e) {}
         }
         t.remove();
-        save();
+        if (added) photoApi.notify(added, title);
         if (added < files.length) toast("Не все фото удалось добавить", 2500);
         else toast("Добавлено: " + added, 1500);
         haptic("medium");
         fillGallery();
       };
 
-      app.append(h("div", { class: "row" }, h("button", { class: "btn", onclick: () => fileInput.click() }, "📷 Добавить фото"), fileInput));
+      app.append(h("div", { class: "row" }, h("button", { class: "btn", onclick: () => fileInput.click() }, "Добавить фото"), fileInput));
       app.append(gallery);
 
       async function fillGallery() {
         let list = [];
-        try { list = await getPhotos(owner.id); } catch (e) {}
+        try { list = await photoApi.list(owner.id); } catch (e) {}
         list.sort((a, b) => a.ts - b.ts);
-        if (owner.photoCount !== list.length) { owner.photoCount = list.length; save(); }
+        if ((owner.photoCount || 0) !== list.length) { owner.photoCount = list.length; persist(); }
         photoUrls.forEach(u => URL.revokeObjectURL(u)); photoUrls = [];
         gallery.innerHTML = "";
         if (!list.length) {
@@ -1164,9 +1338,9 @@
         }
         gallery.style.display = "";
         list.forEach((p, idx) => {
-          const url = URL.createObjectURL(p.blob);
-          photoUrls.push(url);
-          gallery.append(h("div", { class: "photo", onclick: () => openViewer(list, idx, owner, fillGallery) }, h("img", { src: url, alt: "" })));
+          const img = h("img", { alt: "" });
+          photoApi.url(p.id, "thumb").then(u => { photoUrls.push(u); img.src = u; }).catch(() => {});
+          gallery.append(h("div", { class: "photo", onclick: () => openViewer(list, idx, owner, fillGallery) }, img));
         });
       }
       fillGallery();
@@ -1176,6 +1350,7 @@
       let idx = startIdx;
       let currentUrl = null;
       let armed = false;
+      let token = 0;
       const img = h("img", { alt: "" });
       const counter = h("div", { class: "counter" });
       const stage = h("div", { class: "stage" }, img);
@@ -1186,23 +1361,27 @@
       const viewer = h("div", { class: "viewer" }, counter, stage, h("div", { class: "bar" }, prev, closeBtn, del, next));
 
       function show() {
-        if (currentUrl) URL.revokeObjectURL(currentUrl);
-        currentUrl = URL.createObjectURL(list[idx].blob);
-        img.src = currentUrl;
+        const my = ++token;
         counter.textContent = (idx + 1) + " / " + list.length;
         del.textContent = "Удалить";
         armed = false;
+        photoApi.url(list[idx].id, "full").then(u => {
+          if (my !== token) { URL.revokeObjectURL(u); return; }
+          if (currentUrl) URL.revokeObjectURL(currentUrl);
+          currentUrl = u;
+          img.src = u;
+        }).catch(() => {});
       }
-      const closeViewer = () => { if (currentUrl) URL.revokeObjectURL(currentUrl); viewer.remove(); };
+      const closeViewer = () => { token++; if (currentUrl) URL.revokeObjectURL(currentUrl); viewer.remove(); };
 
       prev.onclick = () => { idx = (idx - 1 + list.length) % list.length; show(); };
       next.onclick = () => { idx = (idx + 1) % list.length; show(); };
       closeBtn.onclick = closeViewer;
       del.onclick = async () => {
         if (!armed) { armed = true; del.textContent = "Точно?"; return; }
-        try { await delPhoto(list[idx].id); } catch (e) {}
-        owner.photoCount = Math.max(0, (owner.photoCount || 1) - 1); save();
+        try { await photoApi.remove(list[idx].id); } catch (e) { toast("Не удалось удалить", 2000); return; }
         list.splice(idx, 1);
+        owner.photoCount = list.length; persist();
         onChange();
         if (!list.length) { closeViewer(); return; }
         if (idx >= list.length) idx = list.length - 1;
@@ -1232,7 +1411,7 @@
     ];
 
     function renderTrips(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.trips.emoji + " Наши поездки"));
+      app.append(h("h2", { class: "page-title" }, "Наши поездки"));
       app.append(h("div", { class: "sub" }, "Открой поездку, чтобы заполнить её, добавить воспоминания и фото"));
 
       state.trips.forEach((t, i) => {
@@ -1241,14 +1420,14 @@
         if (t.memories.length) extra.push("воспоминаний: " + t.memories.length);
         if (t.photoCount) extra.push("фото: " + t.photoCount);
         app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => { haptic(); go("trip", t.id); } },
-          h("div", { class: "tile", style: "background:" + (filled ? SECTIONS.trips.grad : "var(--glass-strong)") }, filled ? "📸" : "🗺️"),
+          iconBox("suitcase", filled ? "on" : ""),
           h("div", { class: "body" },
             h("div", { class: "name" }, t.title),
             h("div", { class: "meta" }, [[t.place, t.when].filter(Boolean).join(" · ") || "Ещё не заполнено"].concat(extra).join(" · "))),
-          h("div", { class: "arrow" }, "›")));
+          arrow()));
       });
 
-      addFab("+ Добавить поездку", () => {
+      addFab("Добавить поездку", () => {
         openForm({
           title: "Новая поездка", fields: TRIP_FIELDS,
           onSave: v => { state.trips.push({ id: uid(), title: v.title, place: v.place, when: v.when, notes: v.notes, memories: [], photoCount: 0 }); save(); }
@@ -1265,7 +1444,7 @@
       if (!trip) { back(); return; }
 
       app.append(h("h2", { class: "page-title" }, trip.title));
-      if (trip.place || trip.when) app.append(h("div", { class: "sub", style: "margin-bottom:8px" }, "📍 " + [trip.place, trip.when].filter(Boolean).join(" · ")));
+      if (trip.place || trip.when) app.append(h("div", { class: "sub", style: "margin-bottom:8px" }, [trip.place, trip.when].filter(Boolean).join(" · ")));
       if (trip.notes) app.append(h("div", { class: "note", style: "margin:0 0 14px" }, trip.notes));
 
       app.append(h("div", { class: "row" },
@@ -1273,12 +1452,12 @@
           openForm({
             title: "Данные поездки", fields: TRIP_FIELDS, values: trip,
             onSave: v => { Object.assign(trip, { title: v.title, place: v.place, when: v.when, notes: v.notes }); save(); },
-            onDelete: () => { state.trips = state.trips.filter(t => t.id !== trip.id); save(); deleteOwnerPhotos(trip.id); },
+            onDelete: () => { state.trips = state.trips.filter(t => t.id !== trip.id); save(); },
             afterDelete: () => { stack.pop(); }
           });
-        } }, "✎ Изменить данные")));
+        } }, "Изменить данные")));
 
-      photoBlock(trip, app);
+      photoBlock(trip, app, trip.title);
 
       app.append(h("div", { class: "section-title" }, "Воспоминания"));
       if (!trip.memories.length) app.append(h("div", { class: "empty", style: "padding:18px" }, "Воспоминаний пока нет"));
@@ -1290,11 +1469,11 @@
             onSave: v => { m.text = v.text; save(); },
             onDelete: () => { trip.memories = trip.memories.filter(x => x.id !== m.id); save(); }
           });
-        } }, h("div", { class: "tile sm", style: "background:" + SECTIONS.trips.grad }, "💭"),
+        } }, iconBox("quote", "sm"),
           h("div", { class: "body" }, h("div", { style: "white-space:pre-wrap;word-break:break-word;line-height:1.5;font-size:15px" }, m.text))));
       });
 
-      addFab("+ Добавить воспоминание", () => {
+      addFab("Добавить воспоминание", () => {
         openForm({
           title: "Новое воспоминание", fields: MEMORY_FIELDS,
           onSave: v => { trip.memories.push({ id: uid(), text: v.text }); save(); }
@@ -1308,22 +1487,22 @@
     const prefFilter = { our: "all", isa: "all", makosh: "all" };
 
     const PREF_FIELDS = [
-      { key: "text", label: "Предпочтение", type: "textarea", placeholder: "Например: любит кофе без сахара", required: true },
+      { key: "text", label: "Предпочтение", type: "textarea", placeholder: "Например: кофе без сахара", required: true },
       { key: "level", label: "Важность", type: "level" }
     ];
 
     function renderPrefs(app, key) {
       const s = SECTIONS[key];
-      app.append(h("h2", { class: "page-title" }, s.emoji + " " + s.title));
+      app.append(h("h2", { class: "page-title" }, s.title));
 
       const legend = h("div", { class: "legend" });
       Object.keys(LEVELS).forEach(k => {
-        legend.append(h("div", {}, h("div", { class: "dot " + k }), LEVELS[k].name + " — " + LEVELS[k].hint));
+        legend.append(h("div", {}, h("div", { class: "dot " + k }), LEVELS[k].name + ": " + LEVELS[k].hint));
       });
       app.append(legend);
 
       const chips = h("div", { class: "chips" });
-      [["all", "Все"], ["red", "🔴 Важно"], ["yellow", "🟡 Желательно"], ["green", "🟢 Можно без"]].forEach(([val, name]) => {
+      [["all", "Все"], ["red", "Важно"], ["yellow", "Желательно"], ["green", "Можно без"]].forEach(([val, name]) => {
         chips.append(h("button", {
           class: "chip" + (prefFilter[key] === val ? " active" : ""),
           onclick: () => { prefFilter[key] = val; render(); }
@@ -1335,7 +1514,7 @@
       if (prefFilter[key] !== "all") list = list.filter(p => p.level === prefFilter[key]);
       list.sort((a, b) => LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]);
 
-      if (!list.length) app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "✨"), "Здесь пока ничего нет"));
+      if (!list.length) app.append(h("div", { class: "empty" }, "Здесь пока ничего нет"));
 
       list.forEach((p, i) => {
         app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => {
@@ -1346,10 +1525,10 @@
           });
         } },
           h("div", { class: "dot " + p.level }),
-          h("div", { class: "body" }, h("div", { style: "font-weight:500;line-height:1.45;white-space:pre-wrap;word-break:break-word" }, p.text))));
+          h("div", { class: "body" }, h("div", { style: "line-height:1.45;white-space:pre-wrap;word-break:break-word" }, p.text))));
       });
 
-      addFab("+ Добавить предпочтение", () => {
+      addFab("Добавить предпочтение", () => {
         openForm({
           title: "Новое предпочтение", fields: PREF_FIELDS,
           onSave: v => { state.prefs[key].push({ id: uid(), text: v.text, level: v.level }); save(); }
@@ -1372,29 +1551,28 @@
     }
 
     function renderReasons(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.reasons.emoji + " Почему я тебя люблю"));
-      app.append(h("div", { class: "sub" }, "Нажимай на сердце: каждый раз новая причина"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.reasons.title));
+      app.append(h("div", { class: "sub" }, "Нажми на кнопку, чтобы увидеть случайную причину"));
 
       const all = allReasons();
       const num = h("div", { class: "reason-num" }, "");
-      const txt = h("div", { class: "reason-text" }, "Нажми на сердце 💗");
+      const txt = h("div", { class: "reason-text" }, "Здесь появится причина");
       const card = h("div", { class: "reason-card" }, num, txt);
-      const heart = h("button", { class: "reason-heart" }, "💗");
-      heart.onclick = () => {
+      const btn = h("button", { class: "btn wide" }, "Показать причину");
+      btn.onclick = () => {
         if (!all.length) return;
         let i;
         do { i = Math.floor(Math.random() * all.length); } while (all.length > 1 && i === lastReason);
         lastReason = i;
-        num.textContent = "Причина №" + (i + 1);
+        num.textContent = "Причина № " + (i + 1);
         txt.textContent = all[i].text;
         card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
-        haptic("medium"); celebrate(8);
+        haptic("medium");
       };
-      app.append(h("div", { class: "reason-stage" }, heart, card));
+      app.append(card, btn);
 
-      const toggle = h("button", { class: "linkbtn", onclick: () => { showAllReasons = !showAllReasons; render(); } },
-        showAllReasons ? "Скрыть список" : "Показать все причины (" + all.length + ")");
-      app.append(toggle);
+      app.append(h("button", { class: "linkbtn", style: "margin-top:10px", onclick: () => { showAllReasons = !showAllReasons; render(); } },
+        showAllReasons ? "Скрыть список" : "Показать все причины (" + all.length + ")"));
 
       if (showAllReasons) {
         all.forEach((r, i) => {
@@ -1407,13 +1585,13 @@
               onDelete: () => { state.reasons = state.reasons.filter(x => x.id !== r.id); save(); }
             });
           } },
-            h("div", { class: "tile sm", style: "background:" + SECTIONS.reasons.grad }, String(i + 1)),
-            h("div", { class: "body" }, h("div", { style: "font-weight:500;line-height:1.45" }, r.text)),
-            r.custom ? h("div", { class: "arrow" }, "✎") : null));
+            h("div", { class: "ico sm", style: "font-weight:700;font-size:14px" }, String(i + 1)),
+            h("div", { class: "body" }, h("div", { style: "line-height:1.45" }, r.text)),
+            r.custom ? h("div", { class: "arrow" }, ic("pencil")) : null));
         });
       }
 
-      addFab("+ Добавить причину", () => {
+      addFab("Добавить причину", () => {
         openForm({
           title: "Новая причина", fields: REASON_FIELDS,
           onSave: v => { state.reasons.push({ id: uid(), text: v.text }); save(); }
@@ -1422,17 +1600,17 @@
     }
 
     // =====================================================================
-    //   КУПОНЫ ЛЮБВИ
+    //   КУПОНЫ
     // =====================================================================
     const COUPON_FIELDS = [
-      { key: "title", label: "Название купона", placeholder: "Например: Купон на завтрак в постель", required: true }
+      { key: "title", label: "Название купона", placeholder: "Например: Купон на завтрак", required: true }
     ];
 
     function renderCoupons(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.coupons.emoji + " Купоны любви"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.coupons.title));
 
-      const all = COUPONS.map(c => ({ id: c.id, emoji: c.emoji, title: c.title, custom: false }))
-        .concat(state.coupons.map(c => ({ id: c.id, emoji: "🎟️", title: c.title, custom: true })));
+      const all = COUPONS.map(c => ({ id: c.id, title: c.title, custom: false }))
+        .concat(state.coupons.map(c => ({ id: c.id, title: c.title, custom: true })));
       const used = all.filter(c => state.couponUsed[c.id]).length;
       app.append(h("div", { class: "sub" }, "Использовано: " + used + " из " + all.length + ". Нажми «Использовать», чтобы активировать купон"));
 
@@ -1452,7 +1630,8 @@
           }
           clearTimeout(timer);
           state.couponUsed[c.id] = todayISO(); save();
-          haptic("heavy"); celebrate(22); render();
+          haptic("heavy"); render();
+          toast("Купон использован", 1800);
         };
 
         app.append(h("div", { class: "card" + (usedOn ? " used" : ""), style: delay(Math.min(i, 8)), onclick: () => {
@@ -1464,14 +1643,14 @@
             onDelete: () => { state.coupons = state.coupons.filter(x => x.id !== c.id); delete state.couponUsed[c.id]; save(); }
           });
         } },
-          h("div", { class: "tile", style: "background:" + SECTIONS.coupons.grad }, c.emoji),
+          iconBox("ticket"),
           h("div", { class: "body" },
             h("div", { class: "name" }, c.title),
             h("div", { class: "meta" }, usedOn ? "Использован " + formatDate(usedOn) : "Действителен без срока")),
           btn));
       });
 
-      addFab("+ Добавить купон", () => {
+      addFab("Добавить купон", () => {
         openForm({
           title: "Новый купон", fields: COUPON_FIELDS,
           onSave: v => { state.coupons.push({ id: uid(), title: v.title }); save(); }
@@ -1484,13 +1663,13 @@
     // =====================================================================
     const LETTER_FIELDS = [
       { key: "title", label: "Заголовок", placeholder: "Например: Открой в нашу годовщину", required: true },
-      { key: "from", label: "От кого", type: "select", options: [["Иса", "От Исы"], ["Макош", "От Макош"]] },
+      { key: "from", label: "От кого", type: "select", options: [["isa", "От Исы"], ["her", "От " + HER]] },
       { key: "openDate", label: "Откроется", type: "date", required: true },
       { key: "text", label: "Текст письма", type: "textarea", placeholder: "Напиши, что хочешь сказать", required: true }
     ];
 
     function renderLetters(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.letters.emoji + " Письма в будущее"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.letters.title));
       app.append(h("div", { class: "sub" }, "Письмо закрыто до выбранной даты, а потом его можно прочитать"));
 
       const today = todayISO();
@@ -1498,45 +1677,46 @@
       const opened = state.letters.filter(l => l.openDate <= today).sort((a, b) => b.openDate.localeCompare(a.openDate));
 
       if (!state.letters.length) {
-        app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "💌"), "Писем пока нет.", h("br"), "Напиши первое кнопкой ниже."));
+        app.append(h("div", { class: "empty" }, "Писем пока нет.", h("br"), "Напиши первое кнопкой ниже."));
       }
 
       let i = 0;
       locked.forEach(l => {
         const n = daysUntil({ date: l.openDate });
         app.append(h("div", { class: "card", style: delay(Math.min(i++, 8)), onclick: () => {
-          haptic(); toast("🔒 Откроется " + formatDate(l.openDate), 2200);
+          haptic(); toast("Откроется " + formatDate(l.openDate), 2200);
         } },
-          h("div", { class: "tile", style: "background:linear-gradient(135deg,#5b4a78,#3a2d52)" }, "🔒"),
+          iconBox("lock"),
           h("div", { class: "body" },
             h("div", { class: "name" }, l.title),
-            h("div", { class: "meta" }, "От " + (l.from === "Макош" ? "Макош" : "Исы") + " · откроется " + formatDate(l.openDate)),
+            h("div", { class: "meta" }, fromLabel(l.from) + " · откроется " + formatDate(l.openDate)),
             h("span", { class: "badge" }, "Через " + n + " " + plural(n, ["день", "дня", "дней"]))),
-          h("button", { class: "btn small ghost", onclick: e => {
+          h("button", { class: "btn small ghost", "aria-label": "Изменить", onclick: e => {
             e.stopPropagation();
             openForm({
               title: "Изменить письмо", fields: LETTER_FIELDS, values: l,
               onSave: v => { Object.assign(l, { title: v.title, from: v.from, openDate: v.openDate, text: v.text }); save(); },
               onDelete: () => { state.letters = state.letters.filter(x => x.id !== l.id); save(); }
             });
-          } }, "✎")));
+          } }, ic("pencil"))));
       });
+      document.querySelectorAll(".card .btn.small svg").forEach(s => { s.style.cssText = "width:16px;height:16px;display:block"; });
 
       opened.forEach(l => {
         app.append(h("div", { class: "card", style: delay(Math.min(i++, 8)), onclick: () => {
-          openReader(l.title, "От " + (l.from === "Макош" ? "Макош" : "Исы") + " · " + formatDate(l.openDate), l.text, () => {
+          openReader(l.title, fromLabel(l.from) + " · " + formatDate(l.openDate), l.text, () => {
             state.letters = state.letters.filter(x => x.id !== l.id); save();
           });
         } },
-          h("div", { class: "tile", style: "background:" + SECTIONS.letters.grad }, "💌"),
+          iconBox("mail", "on"),
           h("div", { class: "body" },
             h("div", { class: "name" }, l.title),
-            h("div", { class: "meta" }, "От " + (l.from === "Макош" ? "Макош" : "Исы") + " · " + formatDate(l.openDate)),
+            h("div", { class: "meta" }, fromLabel(l.from) + " · " + formatDate(l.openDate)),
             h("span", { class: "badge" }, "Открыто")),
-          h("div", { class: "arrow" }, "›")));
+          arrow()));
       });
 
-      addFab("+ Написать письмо", () => {
+      addFab("Написать письмо", () => {
         openForm({
           title: "Новое письмо", fields: LETTER_FIELDS,
           onSave: v => { state.letters.push({ id: uid(), title: v.title, from: v.from, openDate: v.openDate, text: v.text }); save(); }
@@ -1553,31 +1733,31 @@
     ];
 
     function renderWishes(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.wishes.emoji + " Хотим вместе"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.wishes.title));
       const done = state.wishes.filter(w => w.done).length;
       app.append(h("div", { class: "sub" }, "Сделано: " + done + " из " + state.wishes.length + ". Места, фильмы, свидания, идеи"));
 
       if (!state.wishes.length) {
-        app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "🌍"), "Пока пусто.", h("br"), "Запиши, что хотите сделать вместе."));
+        app.append(h("div", { class: "empty" }, "Пока пусто.", h("br"), "Запиши, что хотите сделать вместе."));
       }
 
       const sorted = state.wishes.filter(w => !w.done).concat(state.wishes.filter(w => w.done));
       sorted.forEach((w, i) => {
-        const chk = h("button", { class: "check" + (w.done ? " on" : ""), onclick: e => {
+        const chk = h("button", { class: "check" + (w.done ? " on" : ""), "aria-label": "Отметить", onclick: e => {
           e.stopPropagation();
           w.done = !w.done; save();
-          if (w.done) { celebrate(14); haptic("medium"); } else haptic();
+          haptic(w.done ? "medium" : "light");
           render();
-        } }, w.done ? "✓" : "");
+        } }, w.done ? ic("check") : null);
         app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => { haptic(); go("wish", w.id); } },
           chk,
           h("div", { class: "body" },
             h("div", { class: "name" + (w.done ? " strike" : "") }, w.text),
             (w.note || w.photoCount) ? h("div", { class: "meta" }, [w.note ? "есть заметка" : "", w.photoCount ? "фото: " + w.photoCount : ""].filter(Boolean).join(" · ")) : null),
-          h("div", { class: "arrow" }, "›")));
+          arrow()));
       });
 
-      addFab("+ Добавить в список", () => {
+      addFab("Добавить в список", () => {
         openForm({
           title: "Новое желание", fields: WISH_FIELDS,
           onSave: v => { state.wishes.push({ id: "w" + uid(), text: v.text, note: v.note, done: false, photoCount: 0 }); save(); }
@@ -1590,25 +1770,25 @@
       if (!w) { back(); return; }
 
       app.append(h("h2", { class: "page-title" + (w.done ? " strike" : "") }, w.text));
-      app.append(h("div", {}, h("span", { class: "badge" }, w.done ? "Сделано ✓" : "В планах")));
+      app.append(h("div", {}, h("span", { class: "badge" }, w.done ? "Сделано" : "В планах")));
       if (w.note) app.append(h("div", { class: "note", style: "margin:12px 0 0" }, w.note));
 
       app.append(h("div", { class: "row", style: "margin-top:16px" },
         h("button", { class: "btn", onclick: () => {
           w.done = !w.done; save();
-          if (w.done) { celebrate(16); haptic("medium"); }
+          haptic("medium");
           render();
-        } }, w.done ? "Вернуть в планы" : "✓ Мы это сделали"),
+        } }, w.done ? "Вернуть в планы" : "Мы это сделали"),
         h("button", { class: "btn ghost", onclick: () => {
           openForm({
             title: "Изменить", fields: WISH_FIELDS, values: w,
             onSave: v => { w.text = v.text; w.note = v.note; save(); },
-            onDelete: () => { state.wishes = state.wishes.filter(x => x.id !== w.id); save(); deleteOwnerPhotos(w.id); },
+            onDelete: () => { state.wishes = state.wishes.filter(x => x.id !== w.id); save(); },
             afterDelete: () => { stack.pop(); }
           });
-        } }, "✎ Изменить")));
+        } }, "Изменить")));
 
-      photoBlock(w, app);
+      photoBlock(w, app, w.text);
     }
 
     // =====================================================================
@@ -1643,23 +1823,23 @@
           }, 140);
         }
       }
-      const pad = h("div", { class: "keypad" });
+      const keypad = h("div", { class: "keypad" });
       ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"].forEach(k => {
-        if (k === "") { pad.append(h("button", { class: "key empty" }, "")); return; }
-        pad.append(h("button", { class: "key", onclick: () => {
+        if (k === "") { keypad.append(h("button", { class: "key empty" }, "")); return; }
+        keypad.append(h("button", { class: "key", onclick: () => {
           if (k === "⌫") { val = val.slice(0, -1); upd(); haptic(); } else press(k);
         } }, k));
       });
       app.append(h("div", { class: "pin-wrap" },
-        h("div", { class: "lock" }, "🔒"),
-        h("h2", { class: "page-title", style: "margin-top:8px" }, title),
+        h("div", { class: "lock" }, ic("lock")),
+        h("h2", { class: "page-title", style: "margin-top:10px" }, title),
         h("div", { class: "sub", style: "margin-bottom:0" }, sub),
-        dots, pad));
+        dots, keypad));
     }
 
     const GIFT_FIELDS = [
       { key: "text", label: "Что хочется", placeholder: "Например: Тёплый плед", required: true },
-      { key: "for", label: "Для кого", type: "select", options: [["Макош", "Для Макош"], ["Иса", "Для Исы"]] },
+      { key: "for", label: "Для кого", type: "select", options: [["her", "Для " + HER], ["isa", "Для Исы"]] },
       { key: "note", label: "Заметка или ссылка", type: "textarea", placeholder: "Размер, цвет, где купить" }
     ];
 
@@ -1695,17 +1875,17 @@
         return;
       }
 
-      app.append(h("h2", { class: "page-title" }, SECTIONS.gifts.emoji + " Идеи подарков"));
+      app.append(h("h2", { class: "page-title" }, SECTIONS.gifts.title));
       app.append(h("div", { class: "sub" }, "Записывай, что хочется получить или подарить"));
 
       const chips = h("div", { class: "chips" });
-      [["all", "Все"], ["Макош", "Для Макош"], ["Иса", "Для Исы"]].forEach(([val, name]) => {
+      [["all", "Все"], ["her", "Для " + HER], ["isa", "Для Исы"]].forEach(([val, name]) => {
         chips.append(h("button", { class: "chip" + (giftFilter === val ? " active" : ""), onclick: () => { giftFilter = val; render(); } }, name));
       });
       app.append(chips);
 
       const list = state.gifts.filter(g => giftFilter === "all" || g.for === giftFilter);
-      if (!list.length) app.append(h("div", { class: "empty" }, h("span", { class: "big" }, "🎁"), "Пока пусто"));
+      if (!list.length) app.append(h("div", { class: "empty" }, "Пока пусто"));
 
       list.forEach((g, i) => {
         app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => {
@@ -1715,15 +1895,15 @@
             onDelete: () => { state.gifts = state.gifts.filter(x => x.id !== g.id); save(); }
           });
         } },
-          h("div", { class: "tile sm", style: "background:" + SECTIONS.gifts.grad }, "🎁"),
+          iconBox("gift", "sm"),
           h("div", { class: "body" },
             h("div", { class: "name" }, g.text),
-            h("div", { class: "meta" }, "Для " + (g.for === "Иса" ? "Исы" : "Макош")),
+            h("div", { class: "meta" }, "Для " + (g.for === "isa" ? "Исы" : HER)),
             g.note ? h("div", { class: "note" }, g.note) : null),
-          h("div", { class: "arrow" }, "✎")));
+          h("div", { class: "arrow" }, ic("pencil"))));
       });
 
-      addFab("+ Добавить идею", () => {
+      addFab("Добавить идею", () => {
         openForm({
           title: "Новая идея", fields: GIFT_FIELDS,
           onSave: v => { state.gifts.push({ id: uid(), text: v.text, for: v.for, note: v.note }); save(); }
@@ -1732,52 +1912,11 @@
     }
 
     // =====================================================================
-    //   ПЛЕЙЛИСТ
-    // =====================================================================
-    const SONG_FIELDS = [
-      { key: "title", label: "Название песни", placeholder: "Например: Города", required: true },
-      { key: "artist", label: "Исполнитель", placeholder: "Например: Thekitchensongs" }
-    ];
-
-    function renderPlaylist(app) {
-      app.append(h("h2", { class: "page-title" }, SECTIONS.playlist.emoji + " Наш плейлист"));
-      app.append(h("div", { class: "sub" }, "Песни, которые про нас. Кнопка ▶ откроет поиск на YouTube"));
-
-      const all = SONGS.map(s => ({ id: s.id, title: s.title, artist: s.artist, custom: false }))
-        .concat(state.songs.map(s => ({ id: s.id, title: s.title, artist: s.artist, custom: true })));
-
-      all.forEach((s, i) => {
-        const play = h("button", { class: "btn small", onclick: e => {
-          e.stopPropagation();
-          openLink("https://www.youtube.com/results?search_query=" + encodeURIComponent((s.artist + " " + s.title).trim()));
-        } }, "▶");
-        app.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => {
-          if (!s.custom) return;
-          const item = state.songs.find(x => x.id === s.id);
-          openForm({
-            title: "Изменить песню", fields: SONG_FIELDS, values: item,
-            onSave: v => { item.title = v.title; item.artist = v.artist; save(); },
-            onDelete: () => { state.songs = state.songs.filter(x => x.id !== s.id); save(); }
-          });
-        } },
-          h("div", { class: "tile", style: "background:" + SECTIONS.playlist.grad }, "🎵"),
-          h("div", { class: "body" }, h("div", { class: "name" }, s.title), h("div", { class: "meta" }, s.artist || "")),
-          play));
-      });
-
-      addFab("+ Добавить песню", () => {
-        openForm({
-          title: "Новая песня", fields: SONG_FIELDS,
-          onSave: v => { state.songs.push({ id: uid(), title: v.title, artist: v.artist }); save(); }
-        });
-      });
-    }
-
-    // =====================================================================
     //   СТАРТ
     // =====================================================================
-    floaters();
+    applyBackground();
     render();
+    startSync();
     try { if (!localStorage.getItem("welcomed_v1")) showWelcome(); } catch (e) { showWelcome(); }
   </script>
 </body>
