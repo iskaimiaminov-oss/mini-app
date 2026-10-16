@@ -47,6 +47,31 @@
     #app { position: relative; z-index: 1; animation: fade .25s ease both; }
     @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+    /* Внутренние экраны: светлая страница */
+    #bg { transition: opacity .3s ease; }
+    body.inner #bg { opacity: 0; }
+    body.inner {
+      background: linear-gradient(180deg, #e0eed5, #cde0bd) fixed;
+      --on: #243a1b; --on-hint: #5f7855;
+      --shadow: 0 6px 16px rgba(60, 90, 40, .15);
+    }
+    body.inner .section-title::after { background: rgba(36, 58, 27, .16); }
+    body.inner .card:active { background: #eef5e6; }
+    body.inner .page-title { letter-spacing: -.01em; }
+
+    /* Эффекты */
+    .fx { position: fixed; z-index: 40; pointer-events: none; opacity: 0; will-change: transform, opacity; animation: floatUp var(--d, 1.8s) ease-out forwards; }
+    .fx svg { width: 100%; height: 100%; display: block; }
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0deg); }
+      18% { opacity: .95; }
+      100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(var(--s)) rotate(var(--r)); }
+    }
+    @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+    .reason-card.pop { animation: pop .4s cubic-bezier(.2, .8, .2, 1); }
+    .reason-card.pop .reason-text { animation: fade .5s ease .08s both; }
+    @media (prefers-reduced-motion: reduce) { .fx { display: none; } }
+
     /* Верхняя строка */
     .topbar { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; min-height: 40px; }
     .topactions { display: flex; gap: 8px; align-items: center; }
@@ -75,6 +100,15 @@
     .invite { padding: 16px 18px; margin-bottom: 20px; border-radius: 22px; background: var(--surface); color: var(--text); border-left: 5px solid var(--accent); box-shadow: var(--shadow); }
     .invite .lbl { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
     .invite .name { font-weight: 700; font-size: 17px; margin: 6px 0 4px; }
+
+    /* Поиск */
+    .search { position: relative; margin: 0 0 18px; }
+    .search svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 19px; height: 19px; color: var(--hint); pointer-events: none; }
+    .search input { padding: 15px 44px 15px 44px; border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); border: 0; }
+    .search input:focus { background: #fff; }
+    .search input::-webkit-search-cancel-button, .search input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+    .search .clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: var(--hint); font-size: 22px; line-height: 1; display: none; }
+    .search.has .clear { display: block; }
 
     /* Плитки главного экрана */
     .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
@@ -157,7 +191,6 @@
 
     /* Причины */
     .reason-card { margin: 4px 0 14px; padding: 24px 20px; border-radius: 26px; min-height: 150px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); border-left: 5px solid var(--accent); display: flex; flex-direction: column; justify-content: center; gap: 10px; }
-    .reason-card.pop { animation: rise .35s ease; }
     .reason-num { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; min-height: 15px; }
     .reason-text { font-size: 22px; line-height: 1.4; font-style: italic; }
 
@@ -474,7 +507,8 @@
       back:     '<path d="M15 6l-6 6 6 6"/>',
       pencil:   '<path d="M4 20l1-4L16 5l3 3L8 19z"/>',
       quote:    '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/>',
-      sliders:  '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>'
+      sliders:  '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+      search:   '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.2-4.2"/>'
     };
     function ic(name) {
       const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -656,6 +690,7 @@
     //   ФОН
     // =====================================================================
     let bgUrl = null;
+    let homeTop = BG_PRESETS[0].top;
     let lastBgKey = null;
     let role = SYNC_ON ? (function () { try { return localStorage.getItem("role_v1") || ""; } catch (e) { return ""; } })() : "isa";
 
@@ -688,8 +723,17 @@
         el.style.background = p.css;
         top = p.top;
       }
-      try { tg.setHeaderColor(top); tg.setBackgroundColor(top); } catch (e) {}
-      document.documentElement.style.background = top;
+      homeTop = top;
+      syncChrome();
+    }
+
+    // Цвет шапки Telegram: на главной по фону, на внутренних экранах светлый
+    function syncChrome() {
+      const inner = stack.length > 1;
+      document.body.classList.toggle("inner", inner);
+      const c = inner ? "#dcebd0" : homeTop;
+      try { tg.setHeaderColor(c); tg.setBackgroundColor(c); } catch (e) {}
+      document.documentElement.style.background = c;
     }
 
     function setBg(v) {
@@ -1141,6 +1185,7 @@
       if (cur.name !== "gifts") giftsUnlocked = false;
 
       if (stack.length > 1) tg.BackButton.show(); else tg.BackButton.hide();
+      syncChrome();
       // Вне Telegram своей кнопки «назад» нет, поэтому рисуем её сами
       if (stack.length > 1 && !tg.initData) {
         app.append(h("button", { class: "backlink", onclick: back }, ic("back"), "Назад"));
@@ -1154,6 +1199,30 @@
       };
       (pages[cur.name] || renderHome)(app, cur.param);
       if (cur.name === "home" || cur.name === "trips" || cur.name === "wishes") refreshPhotoCounts();
+    }
+
+    // Лёгкие всплывающие значки: зелёные сердечки и стаканчики с матчей
+    const FX_HEART = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 5 6.4 5c2 0 3.5 1.1 4.3 2.4h2.6C14.1 6.1 15.6 5 17.6 5 21 5 23.1 8.4 21.6 11.8 19.5 16.4 12 21 12 21z" fill="currentColor"/></svg>';
+    const FX_CUP = '<svg viewBox="0 0 24 24"><path d="M16.2 2l-1.3 6" stroke="#6f9a45" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M6 8h12l-1.4 12.2a1.8 1.8 0 0 1-1.8 1.6H9.2a1.8 1.8 0 0 1-1.8-1.6L6 8z" fill="#eef5e3" stroke="#8bb55a" stroke-width="1.2"/><path d="M6.4 11.6h11.2l-.9 8.1a1.6 1.6 0 0 1-1.6 1.4H8.9a1.6 1.6 0 0 1-1.6-1.4z" fill="#8bb55a"/></svg>';
+    function burst(anchor, n) {
+      try { if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return; } catch (e) {}
+      const r = anchor.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const greens = ["#6f9a45", "#8bb55a", "#a9c97a", "#4b7335"];
+      n = n || 12;
+      for (let i = 0; i < n; i++) {
+        const cup = i % 6 === 2;
+        const size = cup ? 26 : 12 + Math.random() * 12;
+        const el = document.createElement("div");
+        el.className = "fx";
+        el.innerHTML = cup ? FX_CUP : FX_HEART;
+        el.style.cssText = "left:" + (cx + (Math.random() - .5) * r.width * .7 - size / 2) + "px;top:" + (cy + (Math.random() - .2) * r.height * .4) + "px;width:" + size + "px;height:" + size + "px;"
+          + "color:" + (i % 5 === 4 ? "#e0647c" : greens[i % greens.length]) + ";"
+          + "--x:" + ((Math.random() - .5) * 90) + "px;--y:" + (-(90 + Math.random() * 110)) + "px;--s:" + (.9 + Math.random() * .5) + ";--r:" + ((Math.random() - .5) * 50) + "deg;"
+          + "--d:" + (1.4 + Math.random() * .9) + "s;animation-delay:" + (Math.random() * .25) + "s";
+        document.body.append(el);
+        setTimeout(() => el.remove(), 2900);
+      }
     }
 
     function addFab(text, onclick) { document.body.append(h("button", { class: "fab", onclick }, text)); }
@@ -1178,6 +1247,7 @@
     // =====================================================================
     //   ГЛАВНЫЙ ЭКРАН
     // =====================================================================
+    let countedUp = false;
     function renderTogether(app) {
       const start = parseISO(START);
       const today = todayMid();
@@ -1190,9 +1260,21 @@
       if (d > 0) parts.push(d + " " + plural(d, ["день", "дня", "дней"]));
       const n = daysUntil({ date: START, repeat: "yearly" });
 
+      const numEl = h("span", { class: "num" }, String(total));
+      if (!countedUp) {
+        countedUp = true;
+        const t0 = performance.now();
+        const tick = now => {
+          const k = Math.min(1, (now - t0) / 700);
+          numEl.textContent = String(Math.round(total * (1 - Math.pow(1 - k, 3))));
+          if (k < 1 && numEl.isConnected !== false) requestAnimationFrame(tick);
+        };
+        numEl.textContent = "0";
+        requestAnimationFrame(tick);
+      }
       app.append(h("div", { class: "together" },
         h("div", { class: "lbl" }, "Мы вместе"),
-        h("div", { class: "bignum" }, h("span", { class: "num" }, String(total)), h("span", { class: "unit" }, plural(total, ["день", "дня", "дней"]))),
+        h("div", { class: "bignum" }, numEl, h("span", { class: "unit" }, plural(total, ["день", "дня", "дней"]))),
         parts.length ? h("div", { class: "ymd" }, parts.join(" · ")) : null,
         h("div", { class: "next" }, n === 0 ? "Сегодня наша годовщина" : "До годовщины: " + n + " " + plural(n, ["день", "дня", "дней"]))));
     }
@@ -1209,6 +1291,54 @@
         h("div", { class: "meta" }, meta));
     }
 
+    let homeQuery = "";
+
+    function searchItems(raw) {
+      const q = raw.trim().toLowerCase();
+      if (!q) return [];
+      const has = (...v) => v.some(x => x && String(x).toLowerCase().includes(q));
+      const out = [];
+      state.dates.forEach(d => { if (has(d.title, d.note, d.date)) out.push({ icon: "calendar", name: d.title, meta: "Важные даты", to: ["dates"] }); });
+      state.trips.forEach(t => {
+        const own = has(t.title, t.place, t.when, t.notes);
+        const mem = (t.memories || []).some(m => has(m.text));
+        if (own || mem) out.push({ icon: "suitcase", name: t.title, meta: "Поездки" + (!own && mem ? " · в воспоминаниях" : ""), to: ["trip", t.id] });
+      });
+      ["isa", "makosh"].forEach(k => (state.prefs[k] || []).forEach(p => { if (has(p.text)) out.push({ icon: "user", name: p.text, meta: SECTIONS[k].title, to: ["prefs", k] }); }));
+      state.wishes.forEach(w => { if (has(w.text, w.note)) out.push({ icon: "compass", name: w.text, meta: "Хотим вместе", to: ["wish", w.id] }); });
+      REASONS.concat(state.reasons.map(r => r.text)).forEach(t => { if (has(t)) out.push({ icon: "heart", name: t, meta: "Почему я тебя люблю", to: ["reasons"] }); });
+      COUPONS.concat(state.coupons).forEach(c => { if (has(c.title)) out.push({ icon: "ticket", name: c.title, meta: "Купоны любви", to: ["coupons"] }); });
+      state.letters.forEach(l => { if (has(l.title)) out.push({ icon: "mail", name: l.title, meta: "Письма в будущее", to: ["letters"] }); });
+      return out.slice(0, 30);
+    }
+
+    function renderSearch(app) {
+      const input = h("input", { type: "search", placeholder: "Поиск по дневнику", autocomplete: "off", enterkeyhint: "search" });
+      input.value = homeQuery;
+      const clear = h("button", { class: "clear", "aria-label": "Очистить", onclick: () => { input.value = ""; input.dispatchEvent(new Event("input")); input.focus(); } }, "×");
+      const box = h("div", { class: "search" + (homeQuery ? " has" : "") }, ic("search"), input, clear);
+      const results = h("div", { id: "sres" });
+      const body = h("div", { id: "homebody" });
+      const draw = () => {
+        homeQuery = input.value;
+        box.classList.toggle("has", !!homeQuery);
+        results.innerHTML = "";
+        const q = homeQuery.trim();
+        body.style.display = q ? "none" : "";
+        if (!q) return;
+        const found = searchItems(q);
+        if (!found.length) { results.append(h("div", { class: "empty" }, "Ничего не найдено")); return; }
+        found.forEach((r, i) => results.append(h("div", { class: "card", style: delay(Math.min(i, 8)), onclick: () => { haptic(); go(r.to[0], r.to[1]); } },
+          iconBox(r.icon, "sm"),
+          h("div", { class: "body" }, h("div", { class: "name" }, r.name), h("div", { class: "meta" }, r.meta)),
+          arrow())));
+      };
+      input.addEventListener("input", draw);
+      app.append(box, results, body);
+      draw();
+      return body;
+    }
+
     function renderHome(app) {
       const actions = h("div", { class: "topactions" });
       if (SYNC_ON) { actions.append(h("button", { id: "syncdot", class: "sync", onclick: onSyncClick })); }
@@ -1217,6 +1347,7 @@
       updateSyncEl();
 
       app.append(h("h1", { class: "lead" }, "Это приложение создано для нашего удобства и заботы друг о друге ❤️"));
+      app = renderSearch(app);
 
       // Иса: пока второй человек не подключён, показываем приглашение
       if (SYNC_ON && role === "isa" && partnerLinked === false) {
@@ -1589,6 +1720,7 @@
         num.textContent = "Причина № " + (i + 1);
         txt.textContent = all[i].text;
         card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
+        burst(card, 14);
         haptic("medium");
       };
       app.append(card, btn);
@@ -1652,6 +1784,7 @@
           }
           clearTimeout(timer);
           state.couponUsed[c.id] = todayISO(); save();
+          burst(btn, 10);
           haptic("heavy"); render();
           toast("Купон использован", 1800);
         };
